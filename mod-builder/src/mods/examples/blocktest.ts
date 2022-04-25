@@ -19,7 +19,7 @@ export default class BlockExample extends IBaseMod {
         return "0.0.0";
     }
 
-    static get modifyCodes(): RquestBlocker[] {
+    static get modifyCodes(): RequestBlocker[] {
         /*
         If you want to modify script check out exampleModifyCode.ts
         */

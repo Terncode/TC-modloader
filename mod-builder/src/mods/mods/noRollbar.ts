@@ -29,7 +29,7 @@ export default class NoRollbarMod extends IBaseMod {
                 searcher: "api.rollbar.com",
                 type: "xmlhttprequest",
                 block: true,
-            } as RquestBlocker,
+            } as RequestBlocker,
         ];
     }
 
