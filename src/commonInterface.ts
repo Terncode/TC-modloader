@@ -49,7 +49,7 @@ export interface Dialog {
 
 
 type InterceptType  = "stylesheet" | "script";
-export type CodeModerOrBlocker = CodeModer | RquestBlocker;
+export type CodeModerOrBlocker = CodeModer | RequestBlocker;
 
 export  interface CodeModerBase {
     searcher: RegString;
@@ -59,7 +59,7 @@ export interface CodeModer extends CodeModerBase {
     mod: (code: string, contentType: string | undefined, context: AnyObject, pathname: string, fullUrl: string) => string;
     type: InterceptType[] | InterceptType,
 }
-export interface RquestBlocker extends CodeModerBase{
+export interface RequestBlocker extends CodeModerBase{
     block: true;
     type: (InterceptType | "xmlhttprequest")[] | InterceptType | "xmlhttprequest",
 }
