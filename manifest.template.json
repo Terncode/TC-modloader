@@ -1,0 +1,35 @@
+{
+    "manifest_version": 2,
+    "name": "TC's Mod loader",
+
+    "icons": {
+        "48": "assets/images/icon_48.png",
+        "128": "assets/images/icon_128.png"
+    },
+    "web_accessible_resources": ["normal.svg"],
+    "permissions": [
+        "webRequest",
+        "storage",
+        "tabs",
+        "webRequestBlocking",
+        "browsingData",
+        "activeTab",
+        "<all_urls>"
+    ],
+    "background": {
+        "scripts": [
+            "assets/scripts/background.js"
+        ]
+    },
+    "browser_action": {
+        "default_icon": "assets/images/icon_48.png",
+        "default_popup": "assets/html/popup.html"
+    },
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "content_scripts": [{
+        "matches": ["http://*/*", "https://*/*"],
+        "js": ["assets/scripts/content.js"],
+        "css": ["assets/css/style.css"],
+        "run_at": "document_start"
+    }]
+}

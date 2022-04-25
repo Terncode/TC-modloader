@@ -1,0 +1,16 @@
+@font-face {
+  font-family: origin_tech;
+  src: url('chrome-extension://__MSG_@@extension_id__/assets/fonts/OriginTech.ttf');
+}
+@font-face {
+  font-family: night_machine;
+  src: url('chrome-extension://__MSG_@@extension_id__/assets/fonts/NightMachine.otf');
+}
+@font-face {
+  font-family: dead_space;
+  src: url('chrome-extension://__MSG_@@extension_id__/assets/fonts/DeadSpace.ttf');
+}
+@font-face {
+  font-family: good_timing;
+  src: url('chrome-extension://__MSG_@@extension_id__/assets/fonts/GoodTiming.ttf');
+}

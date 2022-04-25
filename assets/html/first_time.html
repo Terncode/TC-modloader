@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        *, html, body, head {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            overflow: auto;
+        } html, body, head {
+            width: 100%;
+            height: 100%;
+        }
+        .container{
+            width: 100%;
+            height: 100%;
+        }
+
+        .border {
+            border: 1px solid white;
+        }
+        .btn{
+            border: 1px solid white;
+            outline: none;
+            border-radius: 0px;
+            color: white;
+        }
+        .btn:hover{
+            background-color: rgba(255, 255, 255, 0.25);
+            color:white;
+        }
+
+        .banner {
+            background-color: rgba(255,255,255,0.25);
+            font-size: 25pt;
+            font-family: dead_space, monospace;
+            text-align: center;
+            padding: 5px;
+            margin: 5px;
+            text-shadow: 0px 0px 2px #000001;
+        }
+        h1 {
+            font-family: good_timing, monospace;
+        }
+    </style>
+    <title>TC's modloader</title>
+</head>
+<body>
+    <div class="container border">
+        <div class="banner">
+            TC's modloader
+        </div>
+
+        <div class="border m-2 p-2">
+            <h1>First install</h1>
+            <span>I would like to thank you for installing my extension. I have put a lot of effect in this thing. Weeks of coding but I am happy with outcome.
+                If you are interested in my work consider checking out my github <a href="https://github.com/">github</a>
+            </span>
+        </div>
+
+        <div class="border m-2 p-2">
+            <h1>How safe is it to use?</h1>
+            <span>It really depends what you are doing. The mod loader does override csp (Content Security Policy) to make script injection work. Use it with caution.
+                The extension dose have basic mod protection but you should only install mods from trusted source.
+            </span>
+        </div>
+
+        <div class="border m-2 p-2">
+            <h1>Where can I find mods?</h1>
+            <span>I don't really host any website where you could download mods. However you can build your own mod with tools provided tools</span>
+            <a class="btn m-2 p-2" href="/assets/mod-builder.zip">
+                Download mod builder
+            </a>
+        </div>
+
+    </div>
+
+
+</body>
+</html>

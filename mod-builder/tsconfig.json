@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "removeComments": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "target": "ES2018",
+  },
+  "exclude": [
+    "node_modules",
+  ]
+}

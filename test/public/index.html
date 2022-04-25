@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: gray;
+        }
+    </style>
+    <title>Test webpage</title>
+</head>
+<body>
+    <script> 
+            const observer = new MutationObserver((list,b) => {
+                for (const item of list) {
+                    for (const node of item.addedNodes) {
+                        const a = node.src
+                        if(a && a.startsWith("blob")) {
+                            fetch(a).then(async e => {
+                                console.log(await e.text()); // should not work!
+                            });
+                        }
+                    }
+                }
+            });
+            observer.observe(document, {subtree: true, childList: true});
+    </script>
+    <script src="./index-Some4Hash-test.js"></script>
+    <script src="./report-script.js"></script>
+</body>
+</html>

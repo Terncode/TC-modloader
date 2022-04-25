@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "jsx": "react",
+      "module": "commonjs",
+      "removeComments": true,
+      "noImplicitAny": false,
+      "preserveConstEnums": true,
+      "esModuleInterop": true,
+      "target": "ES2018"
+    },
+    "include": [
+        "src/**/*",
+    ],
+    "exclude": [
+      "node_modules",
+    ]
+  }
