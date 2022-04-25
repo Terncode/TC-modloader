@@ -27,6 +27,7 @@ export class ModLoader {
     };
     private gui: ModGui;
     private modsMap = new Map<number, RunningMod>();
+    private toasts = new Map<number, Toast>();
     private actions: (ModMetaCodeEx | number)[] = [];
     private processing = false;
 
@@ -114,7 +115,7 @@ export class ModLoader {
                     ].join("\n"));
                     if (result) {
                         location.reload();
-                        !this.isStrictMod &&this.loader.setType("info").setDescription("Reloading page!").show(Number.MAX_SAFE_INTEGER);
+                        !this.isStrictMod && this.loader.setType("info").setDescription("Reloading page!").show(Number.MAX_SAFE_INTEGER);
 
                         return;
                     }
@@ -136,9 +137,10 @@ export class ModLoader {
             !this.isStrictMod && TC_Toaster.makeToast("Mod loader", `Mod "${mod.name}" is already active`).show(this.toastShowTime);
             return;
         }
+        let toast: Toast;
         if (!this.isStrictMod) {
             Logger.debug(`Loading "${mod.name}"`);
-            !this.isStrictMod &&this.loader.setType("info").setDescription(`Loading "${mod.name}"`).show(this.toastShowTime);
+            toast = TC_Toaster.makeToast("Mod loader", `Loading "${mod.name}"`).show(this.toastShowTime);
         }
         const hash = mod.hash;
 
@@ -238,21 +240,25 @@ export class ModLoader {
             };
 
 
-            if(compiled.flags && compiled.flags.includes("background-script")) {
+            if (compiled.flags && compiled.flags.includes("background-script")) {
                 runningMod["sendBackground"] = data => this.onModMessage(hash, data);
             }
 
-            if(runningMod.onLoad) {
+            if (runningMod.onLoad) {
                 await timeOutPromise(() => runningMod.onLoad());
             }
             this.modsMap.set(mod.hash, {
                 ...compiled,
                 running: runningMod
             });
-            !this.isStrictMod && this.loader.setType("info").setDescription(`Loaded "${mod.name}"`).show(this.toastShowTime);
+            if (!this.isStrictMod && toast) {
+                toast.setDescription(`Loaded "${mod.name}"`).show(this.toastShowTime);
+            }
             this.onModLoad(compiled.hash);
         } catch (error) {
-            !this.isStrictMod && this.loader.setType("error").setDescription(`An error has occurred on mod enable "${mod.name}"`).show(this.toastShowTime);;
+            if (!this.isStrictMod && toast) {
+                toast.setDescription(`An error has occurred on mod enable "${mod.name}"`).setType("error").show(this.toastShowTime);
+            }
             Logger.error(error);
             this.onModError(compiled.hash, error);
             throw new Error(error);
@@ -263,7 +269,10 @@ export class ModLoader {
     async unloadMod(hash: number, showMessage = false) {
         const mod = this.modsMap.get(hash);
         if (mod) {
-            !this.isStrictMod && this.loader.setType("info").setDescription(`Unloading "${mod.name}"`).show(this.toastShowTime);;
+            let toast: Toast;
+            if (!this.isStrictMod) {
+                toast = TC_Toaster.makeToast("Mod loader", `Unloading "${mod.name}"`).show(this.toastShowTime);
+            }
             try {
                 if(showMessage && mod.flags && mod.flags.includes("disable-unload")) {
                     await askToRefresh([
@@ -281,7 +290,9 @@ export class ModLoader {
                     ].join("\n"));
                     if (result) {
                         location.reload();
-                        !this.isStrictMod && this.loader.setType("info").setDescription("Reloading page!").show(Number.MAX_SAFE_INTEGER);
+                        if(!this.isStrictMod) {
+                            toast.setType("info").setDescription("Reloading page!").show(Number.MAX_SAFE_INTEGER);
+                        }
                         return;
                     }
                 }
@@ -289,6 +300,9 @@ export class ModLoader {
                     await timeOutPromise(() => mod.running.onUnload());
                 }
                 this.onModUnload(hash);
+                if(!this.isStrictMod) {
+                    toast.setType("info").setDescription(`Mod unloaded "${mod.name}"`).show(this.toastShowTime);
+                }
 
             } catch (error) {
                 Logger.error(error);

@@ -39,7 +39,6 @@ export class VenomEventHandler extends EventHandler<ContentEvent, VenomEvent> {
                 }
             };
             this.eventElement.addEventListener(this.generatedId, fn);
-            Logger.log("Listener added", this.eventElement, this.generatedId, this.encoder);
         });
     }
 }

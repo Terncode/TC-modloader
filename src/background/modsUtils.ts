@@ -190,6 +190,9 @@ export class BackgroundModHandler {
                         if (requirement.dependencyName === runningMod.mod.dependency && semver.gte(runningMod.mod.version, requirement.version)) {
                             try {
                                 await this.uninstallMod(runningModDep.mod.hash);
+                                removeItem(this.backgroundMods, runningModDep);
+                                removeItem(this.scriptModifiersMods, runningModDep);
+                                removeItem(this.installedMods, runningModDep);
                             } catch (error) {
                                 Logger.error("Uninstalling required mod failed", error);
                             }

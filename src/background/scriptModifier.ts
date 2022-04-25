@@ -1,4 +1,4 @@
-import { CodeModer, RquestBlocker } from "../commonInterface";
+import { CodeModer, RequestBlocker } from "../commonInterface";
 import { InjectorType } from "../interfaces";
 import { OriginSetter } from "../pageSettings";
 import { Logger } from "../utils/logger";
@@ -60,7 +60,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
             hash += selected.mod.hash;
             for (const code of selected.mod.mod.modifyCodes) {
                 if (checkRegOrString(code.searcher, url.pathname)) {
-                    if((code as RquestBlocker).block) {
+                    if((code as RequestBlocker).block) {
                         return { cancel: true };
                     }
                 }
@@ -126,7 +126,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
         if (!hasError) {
             originSetter.setCachedScript(details.url, hash, modded);
         }
-        Logger.error("sendning modded code");
+        Logger.error("sending modded code");
         if (failedMods.length) {
             sendMessageToContent(details.tabId, {
                 type: "show-alert",

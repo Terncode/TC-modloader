@@ -30,20 +30,23 @@ export async  function compileModInContext(code: ArrayBufferLike | string, flags
             raiseMissingPermissions();
         }
     };
+    let wnd = window;
 
-    const wnd = {...window};
-    if (!flags.includes("requests")) {
-        wnd.fetch = raiseMissingPermissions;
-        //@ts-ignore
-        wnd.XMLHttpRequest = ErrorClass;
+    if (SCRIPT_TYPE === "background") {
+        wnd = {...window};
+        if (!flags.includes("requests")) {
+            wnd.fetch = raiseMissingPermissions;
+            //@ts-ignore
+            wnd.XMLHttpRequest = ErrorClass;
+        }
+        const keys = Object.keys(chrome);
+        const fake_chrome_object: any = {};
+        for (const key of keys) {
+            Object.defineProperty(fake_chrome_object, key, {get() { return raiseNotAllowed(); }});
+        }
+    
+        wnd.chrome = fake_chrome_object;
     }
-    const keys = Object.keys(chrome);
-    const fake_chrome_object: any = {};
-    for (const key of keys) {
-        Object.defineProperty(fake_chrome_object, key, {get() { return raiseNotAllowed(); }});
-    }
-
-    wnd.chrome = fake_chrome_object;
 
     const fn = new Function("TC_EXPORT", "window", "globalThis", decompressedCode);
 

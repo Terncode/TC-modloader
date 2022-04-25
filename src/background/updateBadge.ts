@@ -70,7 +70,6 @@ export function createTabUpdate(bmh: BackgroundModHandler): ExBadge {
             if(r) {
                 r[0] = count;
                 map.set(id, r);
-                Logger.error("onModStateChange", id, count);
                 updateTab(id);
             }
         },
@@ -79,7 +78,6 @@ export function createTabUpdate(bmh: BackgroundModHandler): ExBadge {
             if(r) {
                 r[1] = count;
                 map.set(id, r);
-                Logger.error("onModEnableStateChange", id, count);
                 updateTab(id);
             }
         },
