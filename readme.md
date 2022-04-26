@@ -3,7 +3,7 @@
 </center>
 
 # TC's mod-loader
-`TC's mod-loader` is a state-of-the-art web-browser-based mod loader capable of modifying website's running scripts, exposing webpage context to the running mods and givng ability to use browser background script which makes mods really powerful. 
+`TC's mod-loader` is a state-of-the-art web-browser-based mod loader capable of modifying website's running scripts, exposing webpage context to the running mods and giving ability to use browser background script which makes mods really powerful. 
 <center>
     <img src="./assets/images/modloaderpopup.png"></img>
     <img src="./assets/images/webpage-gui.png"></img>
