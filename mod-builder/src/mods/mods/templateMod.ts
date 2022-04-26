@@ -91,8 +91,6 @@ export default class ExampleMod extends IBaseMod /* base mod will initialized du
                 break;
         }
 
-        // you cannot use chrome as the mod is ran in virtual environment
-        // the chrome variable is provided with event if you have specified "chrome-runtime"
 
         // since mod is never instantiated the context is provided with is where you can use global and tab local variables if that exits
         if (typeof event.context.global.count === "undefined") {
