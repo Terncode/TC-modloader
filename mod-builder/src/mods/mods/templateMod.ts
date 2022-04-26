@@ -9,7 +9,7 @@ export default class ExampleMod extends IBaseMod /* base mod will initialized du
             "modify-request", // TemplateMod.modifyCode // will be called on script match
             "background-script", // TemplateMod.background // will be used my modloader
             "requests", // gives you ability to make request
-            "disable-unload" // function on unload won't be called as you are make the mod unlodable
+            "disable-unload" // function onUnload won't be called as you are make the mod unlodable
         ];
     }
     // Required mod name
