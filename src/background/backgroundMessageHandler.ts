@@ -1,7 +1,7 @@
 import { getTabs } from "../utils/chrome";
 import { BackgroundModHandler } from "./modsUtils";
 import { Logger } from "../utils/logger";
-import { getOrigin, handleError, objectifyError, tryCatch } from "../utils/utils";
+import { getOrigin, handleError, objectifyError, setGetter, tryCatch } from "../utils/utils";
 import { BackgroundMessage, BackgroundMessageEnabled, BackgroundMessageOpenIngGameMenu, ContentMessageModDisable, ContentMessageModEnable, ContentMessageSettingsEnabled } from "./backgroundEventInterface";
 import { sendMessageToContent } from "./sendMessage";
 import { ModBackgroundEvent, ModBackgroundInjectorLoad, ModBackgroundInjectorMessage, ModBackgroundInjectorUnload } from "../commonInterface";
@@ -281,15 +281,26 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
                 case "injector-mod-load":
                 case "injector-mod-unload": {
                     const mod = bmh.getModByHash(request.data.hash);
+                    const hash = request.data.hash;
                     const loaded = request.type === "injector-mod-load";
                     let event: ModBackgroundEvent<any, any, any>;
                     const tabOrigin = getOrigin(sender.url);
                     const tabId = sender.tab.id;
                     const context = mod.context.tabs.get(tabId) || {};
                     mod.context.tabs.set(tabId, context);
-                    Logger.error(sender.tab.id, request.data);
                     popupBadge.onModStateChange(sender.tab.id, request.data.runningModsCount);
                     if (loaded) {
+                        mod.tabs[tabId] = {
+                            origin,
+                            send: async (data) => sendMessageToContent<any>(tabId, {
+                                type:"mod-message",
+                                data: {
+                                    hash,
+                                    data
+                                }
+                            }),
+                        };
+                        setGetter(mod.tabs[tabId], "origin", () => tabOrigin);
                         event = {
                             type:"mod-injector-load",
                             origin: tabOrigin,
@@ -298,10 +309,12 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
                                 tab: {
                                     id: tabId,
                                     data: context
-                                }
-                            }
+                                },
+                            },
+                            tabs: mod.tabs,
                         } as ModBackgroundInjectorLoad<any, any>;
                     } else {
+                        delete mod.tabs[tabId];
                         event = {
                             type:"mod-injector-unload",
                             origin: tabOrigin,
@@ -336,7 +349,8 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
                                 data: context
                             }
                         },
-                        data: request.data.data
+                        data: request.data.data,
+                        tabs: mod.tabs
                     } as ModBackgroundInjectorMessage<any, any, any>;
                     tryCatch(() => mod.mod.mod.background(event), mod.errorCather.caught).then(res => {
                         sendResponse(res);

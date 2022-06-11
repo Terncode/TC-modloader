@@ -1,7 +1,7 @@
 import { BackgroundMessage, ContentBackgroundMessage } from "../background/backgroundEventInterface";
 import { TC_Dialog } from "./Dialogs";
 import { Logger } from "./logger";
-import { attachDebugMethod, handleError } from "./utils";
+import { attachDebugMethod, handleError, objectifyError } from "./utils";
 import { TCEventEmitter } from "./eventEmitter";
 import { Injector } from "../contents/injector";
 import { TC_Toaster } from "./Toaster";
@@ -10,7 +10,8 @@ type EventType = Exclude<ContentBackgroundMessage["type"], "ping" | "show-alert"
 export declare interface BackgroundMessageHandler {
     on(event: EventType, listener: (data: Readonly<ContentBackgroundMessage["data"]>, cb: (data: any, error?: Error) => void) => void): this;
     off(event: EventType, listener: (data: Readonly<ContentBackgroundMessage["data"]>) => void): this;
-    emit(event: EventType, data: ContentBackgroundMessage["data"]): this;
+    emit(event: EventType, data: ContentBackgroundMessage["data"]): void;
+    emitReturn(event: EventType, data: ContentBackgroundMessage["data"], sendResponse: (data?: any, error?: Error) => void): boolean[];
 }
 type Fn = (...args: any[]) => void;
 export class BackgroundMessageHandler extends TCEventEmitter {
@@ -90,8 +91,13 @@ export class BackgroundMessageHandler extends TCEventEmitter {
                     break;
                 }
                 default:
-                    this.emit(request.type, request.data);
-                    break;
+                    return this.emitReturn(request.type, request.data, (data, error) => {
+                        if(error) {
+                            sendResponse(objectifyError(error));
+                        } else {
+                            sendResponse(data);
+                        }
+                    }).find(e => e === true) || false;
             }
         }
     };

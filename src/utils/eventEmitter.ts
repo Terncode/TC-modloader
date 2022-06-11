@@ -1,6 +1,6 @@
 import { pushUniq, removeItem } from "./utils";
 
-export type TCListener = (...args: Readonly<any[]>) => void;
+export type TCListener = (...args: Readonly<any[]>) => any;
 export class TCEventEmitter {
     private methods = new Map<string, TCListener[]>();
 
@@ -35,5 +35,15 @@ export class TCEventEmitter {
                 array[i](...args);
             }
         }
+    }
+    protected emitReturn(key: string, ...args: any): any[] {
+        const returns: any[] = [];
+        const array = this.methods.get(key);
+        if (array) {
+            for (let i = 0; i < array.length; i++) {
+                returns.push(array[i](...args));
+            }
+        }
+        return returns;
     }
 }

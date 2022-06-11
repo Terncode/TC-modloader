@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { CodeModerOrBlocker, IBaseMod, ModFlags } from "../commonInterface";
-import { IModGui, IModMenu, ModBackgroundEvent } from "../interfaces";
 
 
 export class BaseMod extends IBaseMod {

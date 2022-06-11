@@ -6,7 +6,7 @@ import { TC_Dialog } from "../utils/Dialogs";
 import { FileReaderImproved } from "../utils/fileUtils";
 import { Logger } from "../utils/logger";
 import { TC_Toaster } from "../utils/Toaster";
-import { PopupController } from "./Controller";
+import { PopupController } from "./controller";
 
 const Curtan = styled.div`
     position: fixed;

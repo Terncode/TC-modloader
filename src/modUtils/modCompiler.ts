@@ -2,7 +2,7 @@ import { BaseMod } from "./BaseMod";
 import zlib from "zlib";
 import { ModActualStorage, ModMeta, ModMetaCompiled, ModMetaCompiledVM, ModRequirement } from "./modInterfaces";
 import { hashString, pushUniq, removeItem } from "../utils/utils";
-import { CancelablePromise } from "../utils/CancelablePromise";
+import { CancelablePromise } from "../utils/cancelablePromise";
 import { ModFlags } from "../commonInterface";
 import { valid } from "semver";
 import { noop } from "lodash";
@@ -12,6 +12,7 @@ interface ModContext {
     [key: string]: any
 }
 
+// TODO create auto timeouts remover
 export async  function compileModInContext(code: ArrayBufferLike | string, flags: ModFlags[], storage?: ModActualStorage): Promise<ModMetaCompiled> {
 
     const decompressedCode = typeof code === "string" ? decodeURIComponent(window.atob(code)) : await decompress(code);
@@ -44,7 +45,7 @@ export async  function compileModInContext(code: ArrayBufferLike | string, flags
         for (const key of keys) {
             Object.defineProperty(fake_chrome_object, key, {get() { return raiseNotAllowed(); }});
         }
-    
+
         wnd.chrome = fake_chrome_object;
     }
 

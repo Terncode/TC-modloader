@@ -306,3 +306,11 @@ export function vmModToModCode(vmMod: ModMetaCompiledVM): ModMetaCode {
         dev: vmMod.dev,
     };
 }
+
+export function setGetter(obj: any, key: string, fn: () => void) {
+    Object.defineProperty(obj, key, { get () {return fn(); }});
+}
+
+export function setSetter(obj: any, key: string, fn: (any: any) => void) {
+    Object.defineProperty(obj, key, { set (v) {fn(v); }});
+}

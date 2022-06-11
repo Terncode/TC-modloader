@@ -4,7 +4,7 @@ import { BackgroundMessageGetOriginSettings, BackgroundMessageSetOriginSettings 
 import { ButtonActivationPosition, InjectorType, OriginSettings, StealthMode } from "../interfaces";
 import { TC_Dialog } from "../utils/Dialogs";
 import { handleError } from "../utils/utils";
-import RadioButtons from "./ButtonRadio";
+import RadioButtons from "./buttonRadio";
 import ModDebugger from "./modDebugger";
 import { Border } from "./utils";
 const Outer = styled.div`

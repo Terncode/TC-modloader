@@ -52,7 +52,7 @@ export default class ExampleBackgroundMod extends IBaseMod {
 
     async sendNext() {
         try {
-            const result = await this.sendBackground!(this.count++);
+            const result = await this.backgroundCom.send!(this.count++);
             console.log(result);
         } catch (error) {
             console.error(error);

@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-declare type ModFlags = "modify-request" | "background-script" | "requests" | "disable-unload" | "extend-loading";
+declare type ModFlags =
+    "modify-request" |
+    "background-script" |
+    "requests" |
+    "disable-unload" |
+    "extend-loading" |
+    "background-api";
 
 declare type RegString = RegExp | string;
 
@@ -102,7 +108,8 @@ declare abstract class IBaseMod {
     exportMethods?(): Readonly<any>;
 
     static background?(event: ModBackgroundEvent): Promise<any> | any;
-    protected sendBackground?<R = any, D = any>(data: D): Promise<R>;
+    protected backgroundCom?: BackgroundCom;
+
     protected onLoad?(): Promise<void> | void;
     protected onUnload?(): Promise<void> | void;
 
@@ -115,16 +122,18 @@ declare abstract class IBaseMod {
     protected deleteItem?(key: string): Promise<void>;
 }
 
-declare interface ModContext<G, T> {
-    context: {
-        global: G,
-        tab?: {
-            id: number,
-            data: T,
-        }
-        chrome?: Readonly<typeof chrome>;
-    }
-    data: any;
+declare interface BackgroundCom {
+    send<R = any, D = any>(data: D): Promise<R>;
+    receive<D = any, R = any>(callback: (((obj: D) => Promise<R> | R) | undefined)): void;
+}
+
+declare interface ModTabs {
+    [key: number]: ModTab;
+}
+
+declare interface ModTab {
+    origin: string;
+    send<D = any, R = any>(data: D): Promise<R>;
 }
 
 declare interface ModBackgroundInstall<G> {
@@ -132,35 +141,35 @@ declare interface ModBackgroundInstall<G> {
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
 }
 declare interface ModBackgroundUninstall<G> {
     type: "mod-uninstall";
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
 }
 declare interface ModBackgroundLoad<G> {
     type: "mod-load";
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
 }
 declare interface ModBackgroundUnload<G> {
     type: "mod-unload";
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
 }
 declare interface ModBackgroundEnable<G> {
     type: "mod-enabled";
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
     origin: string;
 }
 declare interface ModBackgroundDisable<G> {
@@ -168,7 +177,7 @@ declare interface ModBackgroundDisable<G> {
     context: {
         global: G,
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
     origin: string;
 }
 declare interface ModBackgroundInjectorLoad<G, T> {
@@ -180,7 +189,7 @@ declare interface ModBackgroundInjectorLoad<G, T> {
             data: T,
         }
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
     origin: string;
 }
 declare interface ModBackgroundInjectorUnload<G, T> {
@@ -192,7 +201,7 @@ declare interface ModBackgroundInjectorUnload<G, T> {
             data: T,
         }
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
     origin: string;
 }
 
@@ -205,7 +214,7 @@ declare interface ModBackgroundInjectorMessage<G, T, M> {
             data: T,
         }
     }
-    chrome?: Readonly<typeof chrome>;
+    tabs: ModTabs
     data: M;
 }
 

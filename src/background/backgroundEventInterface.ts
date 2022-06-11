@@ -175,7 +175,9 @@ export interface BackgroundMessageCanUninstall extends MessageBase<number>{
 export interface ContentMessageSettingsEnabled extends MessageBase<OriginSettings> {
     type: "origin-settings-update";
 }
-
+export interface BackgroundMessageModMessage extends MessageBase<{hash:number, data: any}>{
+    type: "mod-message";
+}
 
 export type BackgroundMessage = BackgroundMessageOriginRemove | BackgroundMessageOriginAdd |
 BackgroundMessageCheck | BackgroundMessageModInstall | BackgroundMessageModUninstall | BackgroundMessageGetInstalled |
@@ -190,4 +192,5 @@ export type ContentBackgroundMessage =  BackgroundMessagePing | BackgroundMessag
 BackgroundMessageShowAlert | BackgroundMessageShowPrompt | BackgroundMessageShowConfirm |
 BackgroundMessageEnabled | ContentMessageModEnable | ContentMessageModDisable |
 ContentMessageInjectorModLoad | ContentMessageInjectorModUnload | ContentMessageInjectorModMessage |
-ContentMessageInjectorModError | ContentMessageInjectContent | ContentMessageSettingsEnabled | BackgroundMessageOpenIngGameMenu;
+ContentMessageInjectorModError | ContentMessageInjectContent | ContentMessageSettingsEnabled |
+BackgroundMessageOpenIngGameMenu | BackgroundMessageModMessage;

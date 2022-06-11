@@ -10,7 +10,7 @@ import { TC_Dialog } from "../utils/Dialogs";
 import { Logger } from "../utils/logger";
 import { handleError, sortMods } from "../utils/utils";
 import { BackgroundMessageCanUninstall, BackgroundMessageGetInstalled, BackgroundMessageModUninstall } from "../background/backgroundEventInterface";
-import { PopupController } from "./Controller";
+import { PopupController } from "./controller";
 
 const InstallButton = styled.div`
     

@@ -31,7 +31,16 @@ export interface EventVenomModMenuOpen extends TCBaseEvent {
     type: "open-mod-menu",
 }
 
+export interface EventVenomModMessage extends TCBaseEvent {
+    type: "mod-message",
+    data: {
+        hash: number;
+        data: any;
+    };
+}
+
 export type VenomEvent = EventVenomDestroy | EventVenomStatus | EventVenomInitMods |
-EventVenomModEnable | EventVenomModDisable | EventVenomSettingsUpdate | EventVenomModMenuOpen;
+EventVenomModEnable | EventVenomModDisable | EventVenomSettingsUpdate | EventVenomModMenuOpen |
+EventVenomModMessage;
 
 

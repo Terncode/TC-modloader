@@ -1,5 +1,5 @@
 import { random } from "lodash";
-import { BROADCASTER_ATTRIBUTE, DECODER_KEY, TC_MESSAGE_KEY } from "../constants";
+import { DECODER_KEY, TC_MESSAGE_KEY } from "../constants";
 import { Logger } from "../utils/logger";
 import { hashString } from "../utils/utils";
 import { EventHandler } from "../utils/eventHandler";
@@ -8,7 +8,6 @@ import { VenomEvent } from "./venomEventInterface";
 import { OriginSettings } from "../interfaces";
 
 export class VenomEventHandler extends EventHandler<ContentEvent, VenomEvent> {
-    private readonly elementAttribute = BROADCASTER_ATTRIBUTE;
     constructor() {
         super({
             min: Math.round(random(Number.MAX_SAFE_INTEGER * 0.1, Number.MAX_SAFE_INTEGER * 0.1)),

@@ -27,14 +27,15 @@ bmh.init().then(async () => {
             type: "mod-load",
             context: {
                 global: modDef.context.global
-            }
+            },
+            tabs: modDef.tabs
         };
         tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
     }
-    handleTabs();
+    handleTabs(bmh);
 });
 
-function handleTabs() {
+function handleTabs(bmh: BackgroundModHandler) {
     let tabsCount = 0;
     let suspended = false;
 
@@ -49,14 +50,16 @@ function handleTabs() {
                     type: "mod-load",
                     context: {
                         global: modDef.context.global
-                    }
+                    },
+                    tabs: modDef.tabs
                 };
                 tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
             }
             suspended = false;
         }
     });
-    chrome.tabs.onRemoved.addListener(() =>{
+    chrome.tabs.onRemoved.addListener(tabId => {
+        bmh.removeTab(tabId);
         tabsCount--;
         if (tabsCount === 0) {
             suspended = true;
@@ -65,7 +68,8 @@ function handleTabs() {
                     type: "mod-unload",
                     context: {
                         global: modDef.context.global
-                    }
+                    },
+                    tabs: modDef.tabs
                 };
                 tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
             }

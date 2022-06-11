@@ -4,11 +4,11 @@ import { handleError } from "../utils/utils";
 import { getActiveTab } from "../utils/chrome";
 import { ToastType } from "../commonInterface";
 
-export function sendMessageToContent(tabId: number, data: ContentBackgroundMessage) {
-    return new Promise((resolve, reject) => {
+export function sendMessageToContent<A = any>(tabId: number, data: ContentBackgroundMessage) {
+    return new Promise<A>((resolve, reject) => {
         chrome.tabs.sendMessage(tabId, { type:"ping" } as BackgroundMessagePing, (response) => {
             if (response) {
-                resolve(sendActualMessage(tabId, data));
+                resolve(sendActualMessage<A>(tabId, data));
             } else {
                 Logger.debug("Injecting script programmatically");
                 chrome.tabs.executeScript(tabId, {file: "./assets/scripts/content.js"}, () => {
@@ -17,7 +17,7 @@ export function sendMessageToContent(tabId: number, data: ContentBackgroundMessa
                         return reject(new Error(chrome.runtime.lastError.message));
                     } else{
                         setTimeout(() => {
-                            resolve(sendActualMessage(tabId, data));
+                            resolve(sendActualMessage<A>(tabId, data));
                         }, 500);
                     }
                 });
@@ -28,15 +28,15 @@ export function sendMessageToContent(tabId: number, data: ContentBackgroundMessa
 }
 
 
-function sendActualMessage(tabId: number, data: ContentBackgroundMessage) {
-    return new Promise((resolve, reject) => {
+function sendActualMessage<A = any>(tabId: number, data: ContentBackgroundMessage) {
+    return new Promise<A>((resolve, reject) => {
         chrome.tabs.sendMessage(tabId, data, retrieveData => {
             Logger.debug(`Sent to ${tabId}`, data);
             const error = handleError(retrieveData, false);
             if(error) {
                 reject(error);
             } else {
-                resolve(error);
+                resolve(retrieveData);
             }
             return true;
         });

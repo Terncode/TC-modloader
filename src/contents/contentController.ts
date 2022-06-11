@@ -3,7 +3,7 @@ import { TC_Toaster } from "../utils/Toaster";
 import { BackgroundMessageHandler } from "../utils/backgroundCom";
 import { Injector } from "./injector";
 import { askToRefresh, handleError, isStealthMode } from "../utils/utils";
-import { BackgroundMessageGetOriginEnabled, ContentMessageInjectorModError, ContentMessageInjectorModLoad, ContentMessageInjectorModMessage, ContentMessageInjectorModUnload, ContentMessageModStorageUpdate, InjectorData } from "../background/backgroundEventInterface";
+import { BackgroundMessageGetOriginEnabled, BackgroundMessageModMessage, ContentMessageInjectorModError, ContentMessageInjectorModLoad, ContentMessageInjectorModMessage, ContentMessageInjectorModUnload, ContentMessageModStorageUpdate, InjectorData } from "../background/backgroundEventInterface";
 import { ModMetaCode } from "../modUtils/modInterfaces";
 import { OriginSettings } from "../interfaces";
 
@@ -182,8 +182,20 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
             data: settings
         });
     });
-    //bgHandler.emit()
-
-
+    bgHandler.on("mod-message", async (rq: BackgroundMessageModMessage["data"], cb) => {
+        try {
+            const result = await eventHandler.sendPromise({
+                type: "mod-message",
+                data:{
+                    hash: rq.hash,
+                    data: rq.data
+                }
+            }, Number.MAX_SAFE_INTEGER); // No limitation on user generated request
+            cb(result);
+        } catch (error) {
+            cb(undefined, error);
+        }
+        return true;
+    });
 }
 

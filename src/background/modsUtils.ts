@@ -5,7 +5,7 @@ import { ModActualStorage, ModMeta, ModMetaCode, ModMetaCodeWithStorage, ModMeta
 import { MOD_KEY, ORIGIN_KEY } from "../constants";
 import { compileModSafe, compileModInContext } from "../modUtils/modCompiler";
 import { Logger } from "../utils/logger";
-import { ModBackgroundInstall, ModBackgroundLoad, ModBackgroundUninstall, ModBackgroundUnload } from "../commonInterface";
+import { ModBackgroundInstall, ModBackgroundLoad, ModBackgroundUninstall, ModBackgroundUnload, ModTabs } from "../commonInterface";
 import { sendMessageToContent } from "./sendMessage";
 import { noop } from "lodash";
 import semver from "semver";
@@ -32,6 +32,7 @@ export interface Mod extends ModData {
     modderContext: any,
 
     context: ModContext <any, any>;
+    tabs: ModTabs;
 }
 
 interface ModMetaCodeWithStorageAndOrigins extends ModMetaCodeWithStorage {
@@ -69,18 +70,20 @@ export class BackgroundModHandler {
         for (const sortItem of sorted) {
             const modRaw = sortItem.ref;
             try {
-                const mod = await this.createRunningMod(modRaw.modMetaCode.code, modRaw.storage);
-                if (mod.mod.flags.includes("background-script")) {
+                const modDef = await this.createRunningMod(modRaw.modMetaCode.code, modRaw.storage);
+                if (modDef.mod.flags.includes("background-script")) {
                     const event: ModBackgroundLoad<any> = {
                         type: "mod-load",
                         context: {
-                            global: mod.context.global
-                        }
+                            global: modDef.context.global
+                        },
+                        tabs: modDef.tabs
                     };
-                    mod.mod.mod.background(event);
+                    tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
+
                 }
-                mod.enabledOnOrigins = modRaw.enabledOnOrigins;
-                this.pushMods(mod);
+                modDef.enabledOnOrigins = modRaw.enabledOnOrigins;
+                this.pushMods(modDef);
 
             } catch (error) {
                 Logger.error("Unable to create mod", error);
@@ -148,14 +151,16 @@ export class BackgroundModHandler {
             type: "mod-install",
             context: {
                 global: compiledMod.context.global
-            }
+            },
+            tabs: compiledMod.tabs
         };
         await tryCatch(() => compiledMod.mod.mod.background(installEvent), compiledMod.errorCather.caught);
         const loadEvent: ModBackgroundLoad<any> = {
             type: "mod-load",
             context: {
                 global: compiledMod.context.global
-            }
+            },
+            tabs: compiledMod.tabs
         };
         await tryCatch(() => compiledMod.mod.mod.background(loadEvent), compiledMod.errorCather.caught);
 
@@ -177,7 +182,7 @@ export class BackgroundModHandler {
         }
     }
 
-    async uninstallMod(hash: number): Promise < boolean > {
+    async uninstallMod(hash: number): Promise <boolean> {
         const storageMods = await ModSaver.getInstance().load();
         const mod = storageMods.find(e => e.modMetaCode.hash === hash);
         if (mod) {
@@ -218,7 +223,8 @@ export class BackgroundModHandler {
                 type: "mod-unload",
                 context: {
                     global: runningMod.context.global
-                }
+                },
+                tabs: runningMod.tabs,
             };
 
             await tryCatch(() => runningMod.mod.mod.background(unloadEvent), runningMod.errorCather.caught);
@@ -226,7 +232,8 @@ export class BackgroundModHandler {
                 type: "mod-uninstall",
                 context: {
                     global: runningMod.context.global
-                }
+                },
+                tabs: runningMod.tabs
             };
             await tryCatch(() => runningMod.mod.mod.background(loadEvent), runningMod.errorCather.caught);
             if (runningMod) {
@@ -360,7 +367,8 @@ export class BackgroundModHandler {
             context: {
                 global: {},
                 tabs: new Map()
-            }
+            },
+            tabs: {},
         };
     }
 
@@ -442,6 +450,11 @@ export class BackgroundModHandler {
         }
         storage.save(storageMods);
     };
+    removeTab(tabId: number){
+        for (const mod of this.mods) {
+            delete mod.tabs[tabId];
+        }
+    }
     get installedMods(){
         return this.mods;
     }

@@ -8,6 +8,7 @@ import { TC_Toaster } from "../utils/Toaster";
 import { handleError, removeItem, sortMods, vmModToModCode } from "../utils/utils";
 import semver from "semver";
 import { EventEmitter } from "events";
+import { ALL_MOD_FLAGS } from "../constants";
 
 
 export class PopupController {
@@ -59,6 +60,9 @@ export class PopupController {
             if (permissions.includes("extend-loading")) {
                 lines.push("- Extended mod loading times");
             }
+            // if (permissions.includes("background-api")) {
+            //     lines.push("- Running advanced background script");
+            // }
             return lines.join("\n");
         };
 
@@ -68,6 +72,10 @@ export class PopupController {
                 Logger.debug(`Found permissions for mod "${mod.name}" showing prompt to user`);
                 toast.setType("info").setDescription(`Action needed for mod ${mod.name}`);
                 const flags = getData(mod.flags);
+                let unknownFlags = mod.flags.filter(f => !ALL_MOD_FLAGS.includes(f));
+                if (unknownFlags.length > 0) {
+                    await TC_Dialog.alert(`Mod "${mod.name}" has unknown flags\n${unknownFlags.join("\n")}\nThese features won't work!`);
+                }
                 const ok = flags ? await TC_Dialog.confirm(`Mod "${mod.name}" is using permissions\n${flags}\n\nInstall only trustworthy mods`): true;
                 if (ok) {
                     Logger.debug(`User allowed mod install`);

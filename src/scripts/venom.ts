@@ -123,6 +123,15 @@ async function start() {
                     cb({working: false});
                 }
                 return;
+            case "mod-message": {
+                try {
+                    const message = await loader.receiveMessage(data.data.hash, data.data.data);
+                    cb(message);
+                } catch (error) {
+                    cb(undefined, error);
+                }
+                break;
+            }
             default:
                 Logger.debug("Unhandled promise", data);
                 cb(undefined, new Error("unhandled"));

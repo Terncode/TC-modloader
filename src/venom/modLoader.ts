@@ -6,7 +6,7 @@ import { Logger } from "../utils/logger";
 import { TC_Toaster, Toast } from "../utils/Toaster";
 import { askToRefresh, delay, removeItem, timeOutPromise } from "../utils/utils";
 import semver from "semver";
-import { DependencyObject, ToastMethods } from "../commonInterface";
+import { BackgroundCom, DependencyObject, ToastMethods } from "../commonInterface";
 import { ModGui } from "./gui";
 import { ButtonActivationPosition, InjectorType, OriginSettings, StealthMode } from "../interfaces";
 
@@ -27,9 +27,9 @@ export class ModLoader {
     };
     private gui: ModGui;
     private modsMap = new Map<number, RunningMod>();
-    private toasts = new Map<number, Toast>();
     private actions: (ModMetaCodeEx | number)[] = [];
     private processing = false;
+    private messageProcessor = new Map<number, (obj: any) => Promise<any> | any>();
 
     async setItem(_hash: number, _key: string, _value: any, _static: boolean): Promise<any> {}
     async getItem(_hash: number, _key: string, _static: boolean): Promise<any> {}
@@ -238,10 +238,11 @@ export class ModLoader {
                 confirm: (text) => this.isStrictMod ? new Promise<boolean>(r => r(confirm(text))) : TC_Dialog.confirm(text),
                 prompt: (text, defaultText) => this.isStrictMod ? new Promise<string>(r => r(prompt(text, defaultText))) : TC_Dialog.prompt(text, defaultText),
             };
-
-
-            if (compiled.flags && compiled.flags.includes("background-script")) {
-                runningMod["sendBackground"] = data => this.onModMessage(hash, data);
+            const fl = compiled.flags || [];
+            if (fl.includes("background-script")/* || fl.includes("background-api")*/) {
+                const bgObj = createBackgroundCommunicator(data => this.onModMessage(hash, data));
+                runningMod["backgroundCom"] = bgObj.background;
+                this.messageProcessor.set(hash, bgObj.fn);
             }
 
             if (runningMod.onLoad) {
@@ -299,6 +300,7 @@ export class ModLoader {
                 if(mod.running.onUnload) {
                     await timeOutPromise(() => mod.running.onUnload());
                 }
+                this.messageProcessor.delete(hash);
                 this.onModUnload(hash);
                 if(!this.isStrictMod) {
                     toast.setType("info").setDescription(`Mod unloaded "${mod.name}"`).show(this.toastShowTime);
@@ -316,6 +318,15 @@ export class ModLoader {
             Logger.debug("Trying to unload not existing mod");
         }
     }
+    async receiveMessage(hash: number, data: any) {
+        const fn = this.messageProcessor.get(hash);
+        if (fn) {
+            return await fn(data);
+        } else {
+            throw new Error("Mod not loaded");
+        }
+    };
+
     get isStrictMod() {
         return this.settings.stealthMode === StealthMode.Strict;
     }
@@ -329,4 +340,31 @@ export class ModLoader {
     get activeMods() {
         return this.modsMap.size;
     }
+}
+
+function createBackgroundCommunicator(onModMessage: (data) => Promise<any>) {
+    let callback: (((obj: any) => Promise<any> | any) | undefined);
+
+    const background: BackgroundCom ={
+        receive: (cb) => {
+            if(cb === undefined || typeof cb === "function")  {
+                callback = cb;
+            } else {
+                throw new Error("Callback function is wrong type!");
+            }
+        },
+        send: (data: any) => {
+            return onModMessage(data);
+        }
+    };
+    return {
+        background,
+        fn: (data: any) => {
+            if (callback) {
+                return callback(data);
+            } else {
+                throw new Error("Handler not attached!");
+            }
+        }
+    };
 }

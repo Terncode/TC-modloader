@@ -40,7 +40,7 @@ export default class ExampleMod extends IBaseMod /* base mod will initialized du
 
         // to enable background communicator you need to enable "background-script" flag
         // this message will show on static background event.type "mod-injector-message"
-        this.sendBackground("ping").then(() => {
+        this.backgroundCom.send("ping").then(() => {
             console.log("ping received");
         }).catch(console.error);
     }
