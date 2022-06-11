@@ -5,8 +5,8 @@ declare type ModFlags =
     "background-script" |
     "requests" |
     "disable-unload" |
-    "extend-loading" |
-    "background-api";
+    "extend-loading"/* |
+    "background-api"*/;
 
 declare type RegString = RegExp | string;
 
