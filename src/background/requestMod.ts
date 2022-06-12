@@ -1,20 +1,41 @@
-import { chromeGetUrl } from "../utils/chrome";
 import { getOrigin, removeItem } from "../utils/utils";
-import { VENOM_LOCATION } from "../constants";
 import { BackgroundModHandler } from "./modsUtils";
+import { FrameType, HeadersMainFrame } from "../commonInterface";
 
+const types: chrome.webRequest.ResourceType[] = ["main_frame", "sub_frame"];
 export function createRequestInterceptor(bmh: BackgroundModHandler) {
     // Modifying content csp to add unsafe-eval flag to script-src allow mod compiler to compile mods in injected script
     // You might think that safe-eval evil but like this extension is literally made to modify webpages!
     chrome.webRequest.onHeadersReceived.addListener((details) => {
         if (!bmh.enabledOrigins.includes(getOrigin(details.url))) return;
         if (details.method === "GET") {
+            const requestOrigin = getOrigin(details.url);
             const copyHeaders = [...details.responseHeaders];
+            const scripters = bmh.scriptModifiersMods;
+            if (scripters.length) {
+                const enabledMods = bmh.scriptModifiersMods.filter(m => m.mod.mod.modifyCodes?.length && bmh.isModEnabledOnOrigin(m.mod.hash, requestOrigin));
+                if (enabledMods.length) {
+                    const requestUrl = details.url;
+                    const url = new URL(requestUrl);
+                    const contentType = details.responseHeaders.find(e => e.name.toLowerCase() === "content-type");
+                    const type = details.type as FrameType;
+                    for (const selected of enabledMods) {
+                        for(const modder of selected.mod.mod.modifyCodes) {
+                            if (modder.type === details.type || (Array.isArray(modder.type) && (modder.type as FrameType[]).includes(type))) {
+                                const mainModder = modder as HeadersMainFrame;
+                                mainModder.mainHeadersMod(copyHeaders, contentType && contentType.value, selected.modderContext, url.pathname, requestUrl);
+                            }
+                        }
+                    }
+                }
+            }
+
+
             const headersNames = ["X-Content-Security-Policy", "X-WebKit-CSP", "content-security-policy"].map(a => a.toLowerCase());
             const csps = copyHeaders.filter(h => headersNames.includes(h.name.toLowerCase()));
             if (csps.length) {
                 for (const csp of csps) {
-                    const scriptPolicy = `script-src ${chromeGetUrl(VENOM_LOCATION)} 'unsafe-inline' 'unsafe-eval' `;
+                    const scriptPolicy = `script-src 'unsafe-inline' 'unsafe-eval' `;
                     const replaced = csp.value.replace(/script-src /, scriptPolicy);
                     csp.value = replaced.trim();
                 }
@@ -38,5 +59,5 @@ export function createRequestInterceptor(bmh: BackgroundModHandler) {
 
             return { responseHeaders: copyHeaders};
         }
-    }, { urls: ["<all_urls>"], types :["main_frame"]}, ["responseHeaders", "extraHeaders", "blocking"]);
+    }, { urls: ["<all_urls>"], types}, ["responseHeaders", "extraHeaders", "blocking"]);
 }

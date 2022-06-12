@@ -142,9 +142,10 @@ export class ModLoader {
             Logger.debug(`Loading "${mod.name}"`);
             toast = TC_Toaster.makeToast("Mod loader", `Loading "${mod.name}"`).show(this.toastShowTime);
         }
-        const hash = mod.hash;
-
+        let hash = mod.hash;
         const compiled = await compileModInContext(mod.code, mod.flags);
+        compiled.hash = mod.hash;
+
         const prototypeDependency: DependencyObject = {};
 
         if (compiled.requirements && compiled.requirements.length) {

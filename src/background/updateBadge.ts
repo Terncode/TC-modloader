@@ -1,4 +1,3 @@
-import { Logger } from "../utils/logger";
 import { getOrigin } from "../utils/utils";
 import { BackgroundModHandler } from "./modsUtils";
 

@@ -1,6 +1,5 @@
 import { BackgroundModHandler } from "./modsUtils";
 import { getOrigin, removeLastChar } from "../utils/utils";
-import { Logger } from "../utils/logger";
 
 export function cacheCleaner(bmh: BackgroundModHandler) {
     // There is a possibility that service worker will cache load the page.
@@ -13,7 +12,7 @@ export function cacheCleaner(bmh: BackgroundModHandler) {
         const scriptModder = enabledMods.find(m => m.mod.flags.includes("modify-request"));
         if(!scriptModder)  return;
 
-        const initiator = removeLastChar(details.initiator, "/");
+        const initiator = removeLastChar(details.initiator || "", "/");
         const url = removeLastChar(details.url, "/");
         if (initiator === url) {
             const requestOrigin = getOrigin(details.url);
@@ -24,7 +23,7 @@ export function cacheCleaner(bmh: BackgroundModHandler) {
                 }
             }
         }
-    }, { urls: ["<all_urls>"] , types: ["xmlhttprequest", "script", "stylesheet", "main_frame"]});
+    }, { urls: ["<all_urls>"] , types: ["xmlhttprequest", "script", "stylesheet", "main_frame", "sub_frame"]});
 }
 
 

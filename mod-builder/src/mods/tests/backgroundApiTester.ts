@@ -9,7 +9,7 @@ export default class TestStorage extends IBaseMod {
     static get flags(): ModFlags[] {
         return [
             "background-script",
-            "background-api"
+            //"background-api"
         ];
     }
     static get description() {

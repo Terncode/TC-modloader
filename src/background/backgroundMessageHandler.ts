@@ -349,6 +349,7 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
                                 data: context
                             }
                         },
+                        enabled: [...mod.enabledOnOrigins],
                         data: request.data.data,
                         tabs: mod.tabs
                     } as ModBackgroundInjectorMessage<any, any, any>;

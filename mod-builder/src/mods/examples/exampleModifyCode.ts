@@ -20,15 +20,16 @@ export default class ExampleModifyCode extends IBaseMod {
             "modify-request",
         ];
     }
-    static get modifyCodes(): CodeModer[] {
+    static get modifyCodes(): CodeModerOrBlocker[] {
         return [
             {
                 searcher: /index-[a-z0-9A-Z]+-test.js/,
                 type: "script", // You cannot modify xmlhttprequest
-                mod: (code: string, contentType: string | undefined, context: { [key: string]: any}, pathname: string, fullUrl: string) => {
+                mod: (code: string, headers: RequestHeaders, contentType: string | undefined, context: { [key: string]: any}, pathname: string, fullUrl: string) => {
                     let count = context.count || 0;
                     count++;
                     context.count = count;
+                    console.log(headers); // <-- readonly won't have effect on it since we are serving custom code back
                     // returning modded code
                     const BANNER = `/* This code has been tampered ;) */`;
                     const INJECTOR_INFO = `window.DEBUG_INJECT=["${code.length}", "${contentType}", '${JSON.stringify(context)}', "${pathname}", "${fullUrl}"];`;
@@ -40,8 +41,18 @@ export default class ExampleModifyCode extends IBaseMod {
                         .replace(`element.style.color = "white";`, `element.style.color = "black";element.style.fontWeight = "bolder"`);
                     return `${BANNER}\n${INJECTOR_INFO}\n${newCode}`;
                 }
-            }
-        ] as CodeModer[];
+            } as CodeModer,
+            {
+                type: "main_frame",
+                mainHeadersMod: (headers: RequestHeaders, contentType: string | undefined, context: { [key: string]: any}, pathname: string, fullUrl: string) => {
+                    console.log(headers); // <-- headers can be modified
+                    console.log(contentType);
+                    console.log(context);
+                    console.log(pathname);
+                    console.log(fullUrl);
+                }
+            } as HeadersMainFrame,
+        ] as CodeModerOrBlocker[];
     }
 
     onLoad() {

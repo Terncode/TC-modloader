@@ -54,20 +54,32 @@ export interface Dialog {
 }
 
 
-type InterceptType  = "stylesheet" | "script";
-export type CodeModerOrBlocker = CodeModer | RequestBlocker;
+export type InterceptType = "stylesheet" | "script";
+export type FrameType = "main_frame" | "sub_frame";
+export type CodeModerOrBlocker = CodeModer | RequestBlocker | HeadersMainFrame;
 
 export  interface CodeModerBase {
     searcher: RegString;
     type: string[] | string,
 }
+export interface RequestHeader {
+    name: string;
+    value?: string | undefined;
+    binaryValue?: ArrayBuffer | undefined;
+}
+export type RequestHeaders = RequestHeader[];
 export interface CodeModer extends CodeModerBase {
-    mod: (code: string, contentType: string | undefined, context: AnyObject, pathname: string, fullUrl: string) => string;
+    mod: (code: string, headers: RequestHeaders, contentType: string | undefined, context: AnyObject, pathname: string, fullUrl: string) => string;
     type: InterceptType[] | InterceptType,
 }
-export interface RequestBlocker extends CodeModerBase{
+export interface RequestBlocker extends CodeModerBase {
     block: true;
     type: (InterceptType | "xmlhttprequest")[] | InterceptType | "xmlhttprequest",
+}
+
+export interface HeadersMainFrame extends CodeModerBase {
+    mainHeadersMod: (headers: RequestHeaders, contentType: string | undefined, context: AnyObject, pathname: string, fullUrl: string) => void;
+    type: FrameType | FrameType[],
 }
 
 export interface ModDependency<T, N = string> {
@@ -141,6 +153,7 @@ export interface ModBackgroundInstall<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
 }
 export interface ModBackgroundUninstall<G> {
@@ -148,6 +161,7 @@ export interface ModBackgroundUninstall<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
 }
 export interface ModBackgroundLoad<G> {
@@ -155,6 +169,7 @@ export interface ModBackgroundLoad<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
 }
 export interface ModBackgroundUnload<G> {
@@ -162,6 +177,7 @@ export interface ModBackgroundUnload<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
 }
 export interface ModBackgroundEnable<G> {
@@ -169,6 +185,7 @@ export interface ModBackgroundEnable<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
     origin: string;
 }
@@ -177,6 +194,7 @@ export interface ModBackgroundDisable<G> {
     context: {
         global: G,
     }
+    enabled: string[];
     tabs: ModTabs
     origin: string;
 }
@@ -189,6 +207,7 @@ export interface ModBackgroundInjectorLoad<G, T> {
             data: T,
         }
     }
+    enabled: string[];
     tabs: ModTabs
     origin: string;
 }
@@ -201,6 +220,7 @@ export interface ModBackgroundInjectorUnload<G, T> {
             data: T,
         }
     }
+    enabled: string[];
     tabs: ModTabs
     origin: string;
 }
@@ -214,6 +234,7 @@ export interface ModBackgroundInjectorMessage<G, T, M> {
             data: T,
         }
     }
+    enabled: string[];
     tabs: ModTabs
     data: M;
 }

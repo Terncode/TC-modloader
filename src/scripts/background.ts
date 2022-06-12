@@ -28,6 +28,7 @@ bmh.init().then(async () => {
             context: {
                 global: modDef.context.global
             },
+            enabled: [...modDef.enabledOnOrigins],
             tabs: modDef.tabs
         };
         tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
@@ -51,6 +52,7 @@ function handleTabs(bmh: BackgroundModHandler) {
                     context: {
                         global: modDef.context.global
                     },
+                    enabled: [...modDef.enabledOnOrigins],
                     tabs: modDef.tabs
                 };
                 tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
@@ -69,6 +71,7 @@ function handleTabs(bmh: BackgroundModHandler) {
                     context: {
                         global: modDef.context.global
                     },
+                    enabled: [...modDef.enabledOnOrigins],
                     tabs: modDef.tabs
                 };
                 tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);

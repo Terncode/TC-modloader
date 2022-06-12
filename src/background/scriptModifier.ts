@@ -59,12 +59,14 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
         for (const selected of enabledMods) {
             hash += selected.mod.hash;
             for (const code of selected.mod.mod.modifyCodes) {
-                if (checkRegOrString(code.searcher, url.pathname)) {
-                    if((code as RequestBlocker).block) {
-                        return { cancel: true };
+                if(code.searcher) {
+                    if (checkRegOrString(code.searcher, url.pathname)) {
+                        if((code as RequestBlocker).block) {
+                            return { cancel: true };
+                        }
                     }
+                    hash += hashString(code.searcher.toString());
                 }
-                hash += hashString(code.searcher.toString());
             }
         }
         if (details.type === "xmlhttprequest") {
@@ -104,7 +106,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
                 if (Array.isArray(actualModder.type) ? actualModder.type.includes(requestType as any) : actualModder.type === requestType) {
                     if(checkRegOrString(moder.searcher, url.pathname)) {
                         try {
-                            const newScript = (moder as CodeModer).mod(modded, contentType && contentType.value, modifierMod.modderContext, url.pathname, requestUrl);
+                            const newScript = (moder as CodeModer).mod(modded, details.responseHeaders, contentType && contentType.value, modifierMod.modderContext, url.pathname, requestUrl);
                             Logger.debug(`Modding "${requestUrl}" by ${modifierMod.mod.name}`);
                             new Function(newScript);
                             modded = newScript;
@@ -126,7 +128,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
         if (!hasError) {
             originSetter.setCachedScript(details.url, hash, modded);
         }
-        Logger.error("sending modded code");
+        Logger.error("Sending modded code");
         if (failedMods.length) {
             sendMessageToContent(details.tabId, {
                 type: "show-alert",

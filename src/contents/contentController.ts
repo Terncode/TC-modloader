@@ -182,19 +182,20 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
             data: settings
         });
     });
-    bgHandler.on("mod-message", async (rq: BackgroundMessageModMessage["data"], cb) => {
-        try {
-            const result = await eventHandler.sendPromise({
-                type: "mod-message",
-                data:{
-                    hash: rq.hash,
-                    data: rq.data
-                }
-            }, Number.MAX_SAFE_INTEGER); // No limitation on user generated request
-            cb(result);
-        } catch (error) {
-            cb(undefined, error);
-        }
+    bgHandler.on("mod-message", (rq: BackgroundMessageModMessage["data"], cb) => {
+        eventHandler.sendPromise({
+            type: "mod-message",
+            data:{
+                hash: rq.hash,
+                data: rq.data
+            }
+        }, Number.MAX_SAFE_INTEGER) // No limitation on user generated request
+            .then(result => {
+                cb(result);
+            }).catch(err => {
+                cb(undefined, err);
+            });
+
         return true;
     });
 }

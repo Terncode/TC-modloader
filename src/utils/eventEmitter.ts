@@ -41,7 +41,8 @@ export class TCEventEmitter {
         const array = this.methods.get(key);
         if (array) {
             for (let i = 0; i < array.length; i++) {
-                returns.push(array[i](...args));
+                const ev = array[i](...args);
+                returns.push(ev);
             }
         }
         return returns;

@@ -91,13 +91,15 @@ export class BackgroundMessageHandler extends TCEventEmitter {
                     break;
                 }
                 default:
-                    return this.emitReturn(request.type, request.data, (data, error) => {
+                    const res = this.emitReturn(request.type, request.data, (data, error) => {
                         if(error) {
                             sendResponse(objectifyError(error));
                         } else {
                             sendResponse(data);
                         }
-                    }).find(e => e === true) || false;
+                    });
+
+                    return res.find(e => e === true) || false;
             }
         }
     };

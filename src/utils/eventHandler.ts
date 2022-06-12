@@ -20,7 +20,7 @@ export interface SignedTCEvent extends TCEvent {
 }
 
 export class EventHandler<E = TCBaseEvent, R = TCBaseEvent> extends TCEventEmitter {
-    private readonly PROMISE_TIMEOUT = 1000 * 4;
+    private readonly PROMISE_TIMEOUT = 1000 * 30;
     private idGenerator: IDGenerator;
     private sentPromises = new Map<number, { resolve: (result: any) => void, reject: (reason: any) => void, timeout?: NodeJS.Timeout }>();
     protected eventElement: HTMLElement;

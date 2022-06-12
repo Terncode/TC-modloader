@@ -77,6 +77,7 @@ export class BackgroundModHandler {
                         context: {
                             global: modDef.context.global
                         },
+                        enabled: [...modDef.enabledOnOrigins],
                         tabs: modDef.tabs
                     };
                     tryCatch(() => modDef.mod.mod.background(event), modDef.errorCather.caught);
@@ -152,6 +153,7 @@ export class BackgroundModHandler {
             context: {
                 global: compiledMod.context.global
             },
+            enabled: [...compiledMod.enabledOnOrigins],
             tabs: compiledMod.tabs
         };
         await tryCatch(() => compiledMod.mod.mod.background(installEvent), compiledMod.errorCather.caught);
@@ -160,6 +162,7 @@ export class BackgroundModHandler {
             context: {
                 global: compiledMod.context.global
             },
+            enabled: [...compiledMod.enabledOnOrigins],
             tabs: compiledMod.tabs
         };
         await tryCatch(() => compiledMod.mod.mod.background(loadEvent), compiledMod.errorCather.caught);
@@ -224,6 +227,7 @@ export class BackgroundModHandler {
                 context: {
                     global: runningMod.context.global
                 },
+                enabled: [...runningMod.enabledOnOrigins],
                 tabs: runningMod.tabs,
             };
 
@@ -233,6 +237,7 @@ export class BackgroundModHandler {
                 context: {
                     global: runningMod.context.global
                 },
+                enabled: [...runningMod.enabledOnOrigins],
                 tabs: runningMod.tabs
             };
             await tryCatch(() => runningMod.mod.mod.background(loadEvent), runningMod.errorCather.caught);

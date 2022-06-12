@@ -31,7 +31,7 @@ export function sendMessageToContent<A = any>(tabId: number, data: ContentBackgr
 function sendActualMessage<A = any>(tabId: number, data: ContentBackgroundMessage) {
     return new Promise<A>((resolve, reject) => {
         chrome.tabs.sendMessage(tabId, data, retrieveData => {
-            Logger.debug(`Sent to ${tabId}`, data);
+            Logger.debug(`Sent to ${tabId}`, data, retrieveData);
             const error = handleError(retrieveData, false);
             if(error) {
                 reject(error);
