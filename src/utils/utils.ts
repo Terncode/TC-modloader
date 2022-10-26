@@ -97,12 +97,12 @@ export function d() {
     return document;
 }
 
-
 export function appendIfDoesNotExist(element: HTMLElement, appendTo: HTMLElement) {
     if (!d().contains(element)) {
         appendTo.appendChild(element);
     }
 }
+
 export function removeFromDom(element: HTMLElement) {
     const parent = element.parentElement;
     if (parent) {
@@ -211,7 +211,6 @@ export function timeOutPromise<T = any>(fn: () => T | Promise<T>, timeout = 1000
     });
 }
 
-
 export async function tryCatch(fn: () => void, caught?: (data: any) => void) {
     try {
         const result = await timeOutPromise(fn);
@@ -228,13 +227,16 @@ function lastIndex(array: any[]) {
 }
 
 export function randomString(length = 8) {
-    let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let str = "";
-    for (let i = 0; i < length; i++) {
-        str += chars.charAt(Math.floor(Math.random() * chars.length));
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    if (typeof crypto === "undefined") {
+        let str = "";
+        for (let i = 0; i < length; i++) {
+            str += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return str;
+    } else {
+        return [...crypto.getRandomValues(new Uint8Array(length))].map(e => chars[e % chars.length]).join("");
     }
-
-    return str;
 };
 
 export function sortMods<M extends ModMeta>(mods: M[]) {

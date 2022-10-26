@@ -1,8 +1,10 @@
 const webpack = require("webpack");
+const crypto = require("crypto");
 const TerserPlugin = require("terser-webpack-plugin");
 const { uid } = require("uid");
 const WEBPACK_TC_BROADCAST_MESSAGE = `"${uid(32).toUpperCase()}"`;
 const WEBPACK_TC_BROADCAST_ATTRIBUTE = `"${validAttribute()}"`;
+
 function validAttribute () {
     let generated = uid(32);
     for (let i = 0; i < generated.length; i++) {
@@ -13,18 +15,22 @@ function validAttribute () {
         }
         generated =`${generated.slice(i)}${generated.slice(0, i)}`;
     }
-
     return generated;
 }
-function randomString(length = 8) {
-    let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let str = "";
-    for (let i = 0; i < length; i++) {
-        str += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
 
-    return str;
+function randomString(length = 8) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    if (typeof crypto === "undefined") {
+        let str = "";
+        for (let i = 0; i < length; i++) {
+            str += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return str;
+    } else {
+        return crypto.randomBytes(length).toString("hex");
+    }
 };
+
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
