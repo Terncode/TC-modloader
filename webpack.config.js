@@ -2,8 +2,9 @@ const webpack = require("webpack");
 const crypto = require("crypto");
 const TerserPlugin = require("terser-webpack-plugin");
 const { uid } = require("uid");
-const WEBPACK_TC_BROADCAST_MESSAGE = `"${uid(32).toUpperCase()}"`;
-const WEBPACK_TC_BROADCAST_ATTRIBUTE = `"${validAttribute()}"`;
+const WEBPACK_TC_BROADCAST_MESSAGE = uid(32).toUpperCase();
+const WEBPACK_TC_BROADCAST_ATTRIBUTE = validAttribute();
+const BROWSER_ENV = `chrome-mv2`;
 
 function validAttribute () {
     let generated = uid(32);
@@ -35,7 +36,7 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
 const WEBPACK_TC_EXTENSION_PACK = randomString(randomInt(16, 32));
-const WEBPACK_TC_DECODER_KEY =  randomString(512);
+const WEBPACK_TC_DECODER_KEY = randomString(512);
 
 const pack = require("./package.json");
 
@@ -115,12 +116,13 @@ module.exports = scripts.map(s => ({
         // new NodePolyfillPlugin(),
         new webpack.DefinePlugin({
             DEV,
-            SCRIPT_TYPE: `"${s.scriptType}"`,
-            WEBPACK_TC_BROADCAST_MESSAGE,
-            WEBPACK_TC_BROADCAST_ATTRIBUTE,
-            WEBPACK_TC_DECODER_KEY: `"${WEBPACK_TC_DECODER_KEY}"`,
-            WEBPACK_TC_EXTENSION_PACK: `"${WEBPACK_TC_EXTENSION_PACK}"`,
-            VERSION:  `"${pack.version}"`,
+            BROWSER_ENV: JSON.stringify(BROWSER_ENV),
+            SCRIPT_TYPE: JSON.stringify(s.scriptType),
+            WEBPACK_TC_BROADCAST_MESSAGE: JSON.stringify(WEBPACK_TC_BROADCAST_MESSAGE),
+            WEBPACK_TC_BROADCAST_ATTRIBUTE: JSON.stringify(WEBPACK_TC_BROADCAST_ATTRIBUTE),
+            WEBPACK_TC_DECODER_KEY: JSON.stringify(WEBPACK_TC_DECODER_KEY),
+            WEBPACK_TC_EXTENSION_PACK: JSON.stringify(WEBPACK_TC_EXTENSION_PACK),
+            VERSION: JSON.stringify(pack.version),
         }),
         new webpack.ProvidePlugin({
             process: "process/browser",
