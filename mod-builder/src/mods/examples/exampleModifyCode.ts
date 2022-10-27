@@ -26,6 +26,18 @@ export default class ExampleModifyCode extends IBaseMod {
                 searcher: /index-[a-z0-9A-Z]+-test.js/,
                 type: "script", // You cannot modify xmlhttprequest
                 mod: (code: string, headers: RequestHeaders, contentType: string | undefined, context: { [key: string]: any}, pathname: string, fullUrl: string) => {
+                    /*
+                            A very basic code how you can modify running javascript and other related stuff you might find useful
+                            You can use context to store injection variable. If you are modifying code multiple time you can reuse variable that you have bind on context
+                            however if injector turbo charger is enabled this function will not be called with every request due to heavy caching
+
+                            Usually you would use regular expression to replace find and replace stuff
+
+                            Usually you want to expose the variables to the window object and then do the logic onLoad where you can check if you see the variable
+                            Do note that most of the time the mod will be ready be ready before the moded code loads you can warp function in promises and wait for
+                            it load if it doesn't throw na error. On load promise has to resolve under 10 seconds if you need more time than that use extend-loading
+                            flag which won't timeout your mod
+                        */
                     let count = context.count || 0;
                     count++;
                     context.count = count;
