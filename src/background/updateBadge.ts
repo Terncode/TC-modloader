@@ -1,3 +1,6 @@
+import browserAction from "../browserCompatibility/browserAction";
+import { BrowserTab } from "../browserCompatibility/browserInterfaces";
+import tabs from "../browserCompatibility/browserTabs";
 import { getOrigin } from "../utils/utils";
 import { BackgroundModHandler } from "./modsUtils";
 
@@ -13,16 +16,16 @@ export function createTabUpdate(bmh: BackgroundModHandler): ExBadge {
         const res = map.get(id);
         if(res && res[1]) {
             const ok = res[0] === res[1];
-            chrome.browserAction.setBadgeBackgroundColor({color: ok ? "#00a2ff" : "red"});
-            chrome.browserAction.setBadgeText({text:`${res[0]}/${res[1]}`});
+            browserAction.setBadgeBackgroundColor({color: ok ? "#00a2ff" : "red"});
+            browserAction.setBadgeText({text:`${res[0]}/${res[1]}`});
         } else {
-            chrome.browserAction.setBadgeText({text:""});
+            browserAction.setBadgeText({text:""});
         }
     };
 
-    chrome.tabs.onHighlighted.addListener((info) => {
+    tabs.onHighlighted(info => {
         const id = info.tabIds[0];
-        chrome.tabs.query({}, tabs => {
+        tabs.query({}).then(tabs => {
             const tab = tabs.find(t => t.id === id);
             if (tab && tab.url && tab.url.startsWith("http"))  {
                 const res = map.get(id);
@@ -31,13 +34,13 @@ export function createTabUpdate(bmh: BackgroundModHandler): ExBadge {
                     map.set(tab.id, [0, enabled.length]);
                 }
             } else {
-                chrome.browserAction.setBadgeText({text:""});
+                browserAction.setBadgeText({text:""});
             }
             updateTab(id);
         });
     });
 
-    const update = (tab: chrome.tabs.Tab) => {
+    const update = (tab: BrowserTab) => {
         if(tab.url) {
             const enabled = bmh.installedMods.filter(m => m.enabledOnOrigins.includes(getOrigin(tab.url)));
             map.set(tab.id, [0, enabled.length]);
@@ -47,18 +50,18 @@ export function createTabUpdate(bmh: BackgroundModHandler): ExBadge {
         }
     };
 
-    // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    // tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     //     if(changeInfo.status === "loading") {
     //         update(tab);
     //     }
     // });
 
-    chrome.tabs.onCreated.addListener(tab => {
+    tabs.onCreated(tab => {
         if(tab.url) {
             update(tab);
         }
     });
-    chrome.tabs.onRemoved.addListener(id => {
+    tabs.onRemoved(id => {
         map.delete(id);
         updateTab(id);
     });

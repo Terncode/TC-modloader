@@ -1,3 +1,6 @@
+import { BrowserTabQueryInfo } from "../browserCompatibility/browserInterfaces";
+import tabs from "../browserCompatibility/browserTabs";
+
 export async function chromeRemoveItem(key?: string) {
     return new Promise<void>(resolve => {
         chrome.storage.local.remove(key, resolve);
@@ -22,16 +25,9 @@ export async function chromeSetItem(key: string, value: any) {
     });
 }
 
-export function chromeGetUrl(url: string) {
-    return chrome.extension.getURL(url);
-}
-
-export function getTabs(queryInfo: chrome.tabs.QueryInfo = {}) {
-    return new Promise<chrome.tabs.Tab[]>((resolve) => {
-        chrome.tabs.query(queryInfo,tabs =>{
-            resolve(tabs.filter(t => t.url && t.url.startsWith("http")));
-        });
-    });
+export async function getTabs(queryInfo: BrowserTabQueryInfo = {}) {
+    const t = await tabs.query(queryInfo);
+    return t.filter(t => t.url && t.url.startsWith("http"));
 }
 export async function getActiveTab() {
     const tabs = await getTabs({

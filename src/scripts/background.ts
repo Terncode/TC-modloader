@@ -10,6 +10,8 @@ import { tryCatch } from "../utils/utils";
 import { OriginSetter } from "../pageSettings";
 import { createTabUpdate } from "../background/updateBadge";
 import { chromeGetItem, chromeSetItem } from "../utils/chrome";
+import tabs from "../browserCompatibility/browserTabs";
+import runtime from "../browserCompatibility/browserRuntime";
 
 // We first load all installed mods
 const bmh = new BackgroundModHandler();
@@ -40,10 +42,10 @@ function handleTabs(bmh: BackgroundModHandler) {
     let tabsCount = 0;
     let suspended = false;
 
-    chrome.tabs.query({}, function( tabs ){
+    tabs.query({}).then(tabs => {
         tabsCount = tabs.length;
     });
-    chrome.tabs.onCreated.addListener(() => {
+    tabs.onCreated(() => {
         tabsCount++;
         if(suspended) {
             for (const modDef of bmh.backgroundMods) {
@@ -60,7 +62,7 @@ function handleTabs(bmh: BackgroundModHandler) {
             suspended = false;
         }
     });
-    chrome.tabs.onRemoved.addListener(tabId => {
+    tabs.onRemoved(tabId => {
         bmh.removeTab(tabId);
         tabsCount--;
         if (tabsCount === 0) {
@@ -82,11 +84,11 @@ function handleTabs(bmh: BackgroundModHandler) {
 }
 
 
-chrome.runtime.onInstalled.addListener(async () => {
+runtime.onInstalled(async () => {
     const key = "__FIRST_INSTALL";
     const installed = await chromeGetItem(key);
     if(!installed) {
-        chrome.tabs.create({ url: chrome.runtime.getURL("../assets/html/first_time.html") });
+        tabs.create({ url: runtime.getURL("../assets/html/first_time.html") });
         await chromeSetItem(key, true);
     }
 });

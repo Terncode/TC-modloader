@@ -1,3 +1,4 @@
+import tabs from "../browserCompatibility/browserTabs";
 import { DEV_URLS } from "../constants";
 import { compileModSafe } from "../modUtils/modCompiler";
 import { ModMetaCompiledVM } from "../modUtils/modInterfaces";
@@ -98,13 +99,13 @@ export class ModDeveloper {
                     for (const mod of mods) {
                         await ModDeveloper._bmh.installMod(mod);
                     }
-                    const tabs = await getTabs();
-                    for (const tab of tabs) {
+                    const browserTabs = await getTabs();
+                    for (const tab of browserTabs) {
                         const or = getOrigin(tab.url);
                         if (!tab.id) continue;
                         for (const origin of ModDeveloper._bmh.enabledOrigins) {
                             if (or === origin) {
-                                chrome.tabs.reload(tab.id);
+                                tabs.reload(tab.id);
                                 break;
                             }
                         }

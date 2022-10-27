@@ -11,6 +11,7 @@ import { Logger } from "../utils/logger";
 import { handleError, sortMods } from "../utils/utils";
 import { BackgroundMessageCanUninstall, BackgroundMessageGetInstalled, BackgroundMessageModUninstall } from "../background/backgroundEventInterface";
 import { PopupController } from "./controller";
+import runtime from "../browserCompatibility/browserRuntime";
 
 const InstallButton = styled.div`
     
@@ -137,10 +138,10 @@ export default class Mods extends React.Component<P, S> {
 
     onModUninstall = async (mod: ModMeta) =>{
         const result = await new Promise<boolean>((resolve) => {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type: "can-uninstall",
                 data: mod.hash,
-            } as BackgroundMessageCanUninstall, res => {
+            } as BackgroundMessageCanUninstall).then(res => {
                 const error = handleError(res, false);
                 if (error) {
                     TC_Dialog.alert("An error has occurred");
@@ -165,7 +166,7 @@ export default class Mods extends React.Component<P, S> {
 
 
         if(!yes) return;
-        chrome.runtime.sendMessage({type: "mod-uninstall", data: mod.hash} as BackgroundMessageModUninstall, () => {
+        runtime.sendMessage({type: "mod-uninstall", data: mod.hash} as BackgroundMessageModUninstall).then(() => {
             if (!this.destroyed) {
                 this.updateMods();
             }
@@ -181,7 +182,7 @@ export default class Mods extends React.Component<P, S> {
             activeOrigin = this.props.origin;
         }
         Logger.debug("sending response get-installed", activeOrigin);
-        chrome.runtime.sendMessage({type: "get-installed", data: activeOrigin} as BackgroundMessageGetInstalled, (response: ModMeta[]) => {
+        runtime.sendMessage({type: "get-installed", data: activeOrigin} as BackgroundMessageGetInstalled).then((response: ModMeta[]) => {
             Logger.debug("got installed mods", response);
             if (!this.destroyed) {
                 const error = handleError(response, false);

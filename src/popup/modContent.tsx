@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { BackgroundMessageCheck, BackgroundMessageOriginAdd, BackgroundMessageOriginRemove } from "../background/backgroundEventInterface";
+import { BrowserTab } from "../browserCompatibility/browserInterfaces";
+import runtime from "../browserCompatibility/browserRuntime";
+import tabs from "../browserCompatibility/browserTabs";
 import { TC_Toaster } from "../utils/Toaster";
 import { getOrigin, handleError } from "../utils/utils";
 import Mods from "./mods";
@@ -46,7 +49,7 @@ interface S {
     popover?: JSX.Element;
     status: BtnStatus;
     origin: string;
-    tabInfo?: chrome.tabs.Tab;
+    tabInfo?: BrowserTab;
     showSettings: boolean;
 }
 
@@ -70,7 +73,7 @@ export default class ModSettings extends React.Component<P, S> {
     }
 
     private updateInfo() {
-        chrome.tabs.query({ active: true, currentWindow: true}, tabs => {
+        tabs.query({ active: true, currentWindow: true}).then(tabs => {
             const tab = tabs[0];
             if (tab) {
                 const origin = getOrigin(tab.url);
@@ -81,7 +84,7 @@ export default class ModSettings extends React.Component<P, S> {
                             status: "Blocked",
                         });
                     } else {
-                        chrome.runtime.sendMessage({type: "origin-check", data: origin} as BackgroundMessageCheck, (response: boolean) => {
+                        runtime.sendMessage({type: "origin-check", data: origin} as BackgroundMessageCheck).then((response: boolean) => {
                             if(!this.destroyed) {
                                 const err = handleError(response, false);
                                 if (err) {
@@ -140,7 +143,7 @@ export default class ModSettings extends React.Component<P, S> {
                                                                 {data: this.state.origin, type: "origin-add"} as BackgroundMessageOriginAdd :
                                                                 {data: this.state.origin, type: "origin-remove"} as BackgroundMessageOriginRemove;
 
-            chrome.runtime.sendMessage(data, (response: boolean) => {
+            runtime.sendMessage(data).then((response: boolean) => {
                 const toastDuration = 1000;
                 TC_Toaster.makeToast("System",`"${this.state.origin}" ${isAdding ? "Added" : "Removed"}`).show(toastDuration);
 

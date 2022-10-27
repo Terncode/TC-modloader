@@ -9,6 +9,8 @@ import { js as beautify } from "js-beautify";
 import { TC_Dialog } from "../utils/Dialogs";
 import styled from "styled-components";
 import { DEV_URLS } from "../constants";
+import tabs from "../browserCompatibility/browserTabs";
+import runtime from "../browserCompatibility/browserRuntime";
 
 const Select = styled.select`
     outline: none;
@@ -60,7 +62,7 @@ export default class ModDebugger extends React.Component<P, S> {
         this.destroyed = true;
     }
     private fetchDeveloperState() {
-        chrome.runtime.sendMessage({type: "developer-state" } as BackgroundMessageModState, (response: boolean) => {
+        runtime.sendMessage({type: "developer-state" } as BackgroundMessageModState).then((response: boolean) => {
             if (!this.destroyed) {
                 this.setState({dev: response});
             }
@@ -68,7 +70,7 @@ export default class ModDebugger extends React.Component<P, S> {
     }
 
     fetchErrors(mod: ModMeta) {
-        chrome.runtime.sendMessage({type: "get-mod-internal-data", data: mod.hash} as BackgroundMessageFetchErrors, (response: {errors: any[], code: string}) => {
+        runtime.sendMessage({type: "get-mod-internal-data", data: mod.hash} as BackgroundMessageFetchErrors).then((response: {errors: any[], code: string}) => {
             if (!this.destroyed) {
                 const error = handleError(response, false);
                 if(error) {
@@ -86,7 +88,7 @@ export default class ModDebugger extends React.Component<P, S> {
     }
 
     fetchMods() {
-        chrome.runtime.sendMessage({type: "get-installed", data: ""} as BackgroundMessageGetInstalled, (response: ModMeta[]) => {
+        runtime.sendMessage({type: "get-installed", data: ""} as BackgroundMessageGetInstalled).then((response: ModMeta[]) => {
             if (!this.destroyed) {
                 const error = handleError(response, false);
                 if(error) {
@@ -104,7 +106,7 @@ export default class ModDebugger extends React.Component<P, S> {
     };
     extractCompiledCode = async () => {
         if (this.state.debugging) {
-            await TC_Dialog.alert("Extracted code might be hard to read");
+            await TC_Dialog.alert("Note that extracted code is not a source code of the mod but executable javascript code");
             const beautiOptions = { indent_size: 2, space_in_empty_paren: true };
             const code = decodeURIComponent(window.atob(this.state.debugging.code));
             const beutifyCode = beautify(`${code}`, beautiOptions);
@@ -167,12 +169,12 @@ export default class ModDebugger extends React.Component<P, S> {
             ].join("\n"));
             if(ok) {
 
-                chrome.runtime.sendMessage({type: "developer-change", data: true} as BackgroundMessageModDeveloper, () => {
+                runtime.sendMessage({type: "developer-change", data: true} as BackgroundMessageModDeveloper).then(() => {
                     this.fetchDeveloperState();
                 });
             }
         } else {
-            chrome.runtime.sendMessage({type: "developer-change", data: false} as BackgroundMessageModDeveloper, () => {
+            runtime.sendMessage({type: "developer-change", data: false} as BackgroundMessageModDeveloper).then(() => {
                 this.fetchDeveloperState();
             });
         }
@@ -181,7 +183,7 @@ export default class ModDebugger extends React.Component<P, S> {
         return this.state.isPopup;
     }
     openInNewTab = () => {
-        chrome.tabs.create({"url": location.href});
+        tabs.create({"url": location.href});
     };
 
     renderContent() {
@@ -213,7 +215,7 @@ export default class ModDebugger extends React.Component<P, S> {
             return <>
                 <Button onClick={this.enable}>Debug mod</Button>
                 <Button onClick={() => {
-                    window.open(chrome.extension.getURL("/assets/mod-builder.zip"));
+                    window.open(runtime.getURL("/assets/mod-builder.zip"));
                 }}>Download mod builder</Button>
                 <Button onClick={this.enableModDeveloper} hidden={this.state.dev === undefined}>
                     {this.state.dev === true ? "Disable mod developer" : "Enable mod developer"}

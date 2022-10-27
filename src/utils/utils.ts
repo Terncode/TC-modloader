@@ -135,7 +135,7 @@ export function writeClipboard(text: string) {
 
 
 export function delay(ms: number) {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise<void>(r => setTimeout(r, ms));
 }
 
 

@@ -447,7 +447,7 @@ export class ModGui implements IModGui {
         const div = document.createElement("div");
         const span = document.createElement("span");
         const button = this.createBtn(buttonText, cb, type);
-        span.textContent = `${buttonText}:`;
+        span.textContent = `${buttonTitle}:`;
         div.appendChild(span);
         div.appendChild(button.button);
         return {

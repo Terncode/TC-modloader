@@ -1,7 +1,7 @@
 import { InjectorData } from "../background/backgroundEventInterface";
+import runtime from "../browserCompatibility/browserRuntime";
 import { TC_MESSAGE_KEY, VENOM_LOCATION, DECODER_KEY } from "../constants";
 import { ButtonActivationPosition, InjectorType, StealthMode } from "../interfaces";
-import { chromeGetUrl } from "../utils/chrome";
 import { Logger } from "../utils/logger";
 import { ContentEventHandler } from "./contentEventHandler";
 
@@ -9,7 +9,7 @@ export class Injector {
     private _injectorData: InjectorData = {
         broadcastId: TC_MESSAGE_KEY,
         decoderKey: DECODER_KEY,
-        url: chromeGetUrl(VENOM_LOCATION),
+        url: runtime.getURL(VENOM_LOCATION),
         settings: {
             activateButtonPosition: ButtonActivationPosition.Top,
             injectorType: InjectorType.Turbo,

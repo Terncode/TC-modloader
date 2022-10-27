@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { BackgroundMessageGetOriginSettings, BackgroundMessageSetOriginSettings } from "../background/backgroundEventInterface";
+import runtime from "../browserCompatibility/browserRuntime";
 import { ButtonActivationPosition, InjectorType, OriginSettings, StealthMode } from "../interfaces";
 import { TC_Dialog } from "../utils/Dialogs";
 import { handleError } from "../utils/utils";
@@ -44,10 +45,10 @@ export default class Settings extends React.Component<P, S> {
 
     componentDidMount(): void {
         if(this.props.origin) {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type:"get-origin-settings",
                 data: this.props.origin
-            } as BackgroundMessageGetOriginSettings, data => {
+            } as BackgroundMessageGetOriginSettings).then(data => {
                 if (this.destroyed) return;
                 const error = handleError(data, false);
                 if (error) {
@@ -68,10 +69,10 @@ export default class Settings extends React.Component<P, S> {
 
     sendUpdateToBackground() {
         requestAnimationFrame(() => {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type:"set-origin-settings",
                 data: this.state.settings
-            } as BackgroundMessageSetOriginSettings, data => {
+            } as BackgroundMessageSetOriginSettings).then(data => {
                 const error = handleError(data, false);
                 if(error) {
                     console.error(error);
@@ -135,7 +136,7 @@ export default class Settings extends React.Component<P, S> {
     renderGuiSelector() {
         const msg = [
             "Gui elements disabled due to stealth mode set to strict mode",
-            "you can call your in-game mod-menu by double clicking on title above"
+            "you can call mod-menu by double clicking on title above"
         ].join("\n");
 
         if (this.state.settings.stealthMode === StealthMode.Strict) {

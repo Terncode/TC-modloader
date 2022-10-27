@@ -1,5 +1,4 @@
 import { EXTENSION_PACK_KEY } from "../constants";
-
 type Buffer = number[];
 
 export class EncodeDecoder {
@@ -17,7 +16,7 @@ export class EncodeDecoder {
         }
         return buffer;
     }
-    decode(what:Buffer): string {
+    decode(what: Buffer): string {
         let decoded = "";
         const nextIndex = new NextIndex(this.encoding_key, EncodeDecoder.runtime_hash);
         for (let i = 0; i < what.length; i++) {
@@ -35,7 +34,7 @@ class NextIndex {
         for (let i = 0; i < merged.length; i++) {
             this.index += merged.charCodeAt(i);
             if (i % 2) {
-                this.index =  Math.round(this.index / (merged.length * 0.5));
+                this.index = Math.round(this.index / (merged.length * 0.5));
             }
 
         }

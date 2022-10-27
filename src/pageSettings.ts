@@ -1,10 +1,13 @@
 import { DECODER_KEY, ORIGIN_SETTINGS_KEY, TC_MESSAGE_KEY, VENOM_LOCATION } from "./constants";
-import { chromeGetItem, chromeGetUrl, chromeSetItem } from "./utils/chrome";
+import { chromeGetItem, chromeSetItem } from "./utils/chrome";
 import { uid } from "uid";
 import { attachDebugMethod, getOrigin, randomString } from "./utils/utils";
 import { InjectorData } from "./background/backgroundEventInterface";
 import { escapeRegExp } from "lodash";
 import { ButtonActivationPosition, InjectorType, OriginSettings, StealthMode } from "./interfaces";
+import { BrowserTab } from "./browserCompatibility/browserInterfaces";
+import tabs from "./browserCompatibility/browserTabs";
+import runtime from "./browserCompatibility/browserRuntime";
 
 export const defaultOriginSettings: Readonly<OriginSettings> = {
     injectorType: InjectorType.Turbo,
@@ -22,17 +25,17 @@ export class OriginSetter {
     constructor() {
         attachDebugMethod("OriginSetter", this);
         const request = new XMLHttpRequest();
-        const url = chromeGetUrl(VENOM_LOCATION);
+        const url = runtime.getURL(VENOM_LOCATION);
         request.open("GET",url, false);
         request.send();
         if (request.status === 200) {
             this.injectorCode = request.responseText;
         }
 
-        chrome.tabs.onRemoved.addListener(this.onTabRemoved);
+        tabs.onRemoved(this.onTabRemoved);
     }
     destroy() {
-        chrome.tabs.onRemoved.removeListener(this.onTabRemoved);
+        tabs.onRemoved(this.onTabRemoved);
     }
     onTabRemoved = (tabId: number) => {
         this.ids.delete(tabId);
@@ -62,7 +65,7 @@ export class OriginSetter {
         this.save();
     }
 
-    getAllSettings(tab: chrome.tabs.Tab, regenerate = false): InjectorData {
+    getAllSettings(tab: BrowserTab, regenerate = false): InjectorData {
         if (!this.ids.has(tab.id) || regenerate) {
             const id = uid(32);
             this.ids.set(tab.id, id);

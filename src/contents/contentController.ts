@@ -6,6 +6,7 @@ import { askToRefresh, handleError, isStealthMode } from "../utils/utils";
 import { BackgroundMessageGetOriginEnabled, BackgroundMessageModMessage, ContentMessageInjectorModError, ContentMessageInjectorModLoad, ContentMessageInjectorModMessage, ContentMessageInjectorModUnload, ContentMessageModStorageUpdate, InjectorData } from "../background/backgroundEventInterface";
 import { ModMetaCode } from "../modUtils/modInterfaces";
 import { OriginSettings } from "../interfaces";
+import runtime from "../browserCompatibility/browserRuntime";
 
 export async function createContentController(bgHandler: BackgroundMessageHandler, inject?: InjectorData) {
     const injector = new Injector(inject);
@@ -66,7 +67,7 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
     if (status.working !== true) { // We throw error as we don't want to continue if the script doesn't have full access!
         throw new Error("Script does not have full access over webpage!");
     }
-    chrome.runtime.sendMessage({ type: "get-origin-enabled-mods", data: origin } as BackgroundMessageGetOriginEnabled, (mods: ModMetaCode[]) => {
+    runtime.sendMessage({ type: "get-origin-enabled-mods", data: origin } as BackgroundMessageGetOriginEnabled).then((mods: ModMetaCode[]) => {
         eventHandler.sendMessage({ type: "init-mods", data: mods});
     });
 
@@ -83,17 +84,17 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
 
         switch (event.type) {
             case "storage-get":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type:"mod-storage-update",
                     data: {
                         type: "storage-get",
                         hash: event.data.hash,
                         key: event.data.key,
                     }
-                } as ContentMessageModStorageUpdate, handleStorageCallBack);
+                } as ContentMessageModStorageUpdate).then(handleStorageCallBack);
                 break;
             case "storage-set":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type:"mod-storage-update",
                     data: {
                         type: "storage-save",
@@ -101,26 +102,26 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
                         key: event.data.key,
                         value: event.data.value,
                     }
-                } as ContentMessageModStorageUpdate, handleStorageCallBack);
+                } as ContentMessageModStorageUpdate).then(handleStorageCallBack);
                 break;
             case "storage-delete":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type:"mod-storage-update",
                     data: {
                         type: "storage-delete",
                         hash: event.data.hash,
                         key: event.data.key,
                     }
-                } as ContentMessageModStorageUpdate, handleStorageCallBack);
+                } as ContentMessageModStorageUpdate).then(handleStorageCallBack);
                 break;
             case "mod-message":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type: "injector-mod-message",
                     data: {
                         hash: event.data.hash,
                         data: event.data.data
                     },
-                } as ContentMessageInjectorModMessage, handleStorageCallBack);
+                } as ContentMessageInjectorModMessage).then(handleStorageCallBack);
                 break;
 
             default:
@@ -135,22 +136,22 @@ async function onInjection(injector: Injector, bgHandler: BackgroundMessageHandl
         };
         switch (event.type) {
             case "mod-load":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type: "injector-mod-load",
                     data: event.data,
-                } as ContentMessageInjectorModLoad, handleStorageCallBack);
+                } as ContentMessageInjectorModLoad).then(handleStorageCallBack);
                 break;
             case "mod-unload":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type: "injector-mod-unload",
                     data: event.data,
-                } as ContentMessageInjectorModUnload, handleStorageCallBack);
+                } as ContentMessageInjectorModUnload).then(handleStorageCallBack);
                 break;
             case "mod-error":
-                chrome.runtime.sendMessage({
+                runtime.sendMessage({
                     type: "injector-mod-error",
                     data: event.data,
-                } as ContentMessageInjectorModError, handleStorageCallBack);
+                } as ContentMessageInjectorModError).then(handleStorageCallBack);
                 break;
 
             default:

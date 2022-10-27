@@ -9,6 +9,7 @@ import { handleError, removeItem, sortMods, vmModToModCode } from "../utils/util
 import semver from "semver";
 import { EventEmitter } from "events";
 import { ALL_MOD_FLAGS } from "../constants";
+import runtime from "../browserCompatibility/browserRuntime";
 
 
 export class PopupController {
@@ -144,10 +145,10 @@ export class PopupController {
 
     private static fetchByName(name: string) {
         return new Promise<ModMeta[]>((resolve, reject) => {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type: "fetch-mod-dependency-name",
                 data: name
-            } as BackgroundMessageFetchModDependency, response => {
+            } as BackgroundMessageFetchModDependency).then(response => {
                 const error = handleError(response, false);
                 if (error) {
                     reject(error);
@@ -160,10 +161,10 @@ export class PopupController {
 
     private static sendModInstallBackground(mod: ModMetaCode) {
         return new Promise<void>((resolve, reject) => {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type:"mod-install",
                 data: mod
-            } as BackgroundMessageModInstall, response => {
+            } as BackgroundMessageModInstall).then(response => {
                 const error = handleError(response, false);
                 if (error) {
                     reject(error);

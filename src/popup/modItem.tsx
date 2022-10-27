@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
 import { BackgroundMessageGetReportModStateGet, BackgroundMessageGetReportModStateSet } from "../background/backgroundEventInterface";
+import runtime from "../browserCompatibility/browserRuntime";
+import tabs from "../browserCompatibility/browserTabs";
 import { ModMeta, ModStatus } from "../modUtils/modInterfaces";
 import { getTabs } from "../utils/chrome";
 import { TC_Dialog } from "../utils/Dialogs";
@@ -109,12 +111,12 @@ export default class ModItem extends React.Component<ModItemProps, S> {
         if (this.destroyed) return;
         this.setState({status: "loading"});
         if(this.props.origin) {
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type: "get-mod-state",
                 data: {
                     hash: this.props.modMeta.hash,
                     origin: this.props.origin,
-                }} as BackgroundMessageGetReportModStateGet, response => {
+                }} as BackgroundMessageGetReportModStateGet).then(response => {
                 if (this.destroyed) return;
                 const error = handleError(response, false);
                 if (error) {
@@ -145,22 +147,22 @@ export default class ModItem extends React.Component<ModItemProps, S> {
             const modMeta = this.props.modMeta;
             const currentOrigin = this.props.origin;
 
-            chrome.runtime.sendMessage({
+            runtime.sendMessage({
                 type: "set-mod-state",
                 data: {
                     hash: modMeta.hash,
                     origin: currentOrigin,
                     value: enable,
                 }
-            } as BackgroundMessageGetReportModStateSet, (err) => {
+            } as BackgroundMessageGetReportModStateSet).then((err) => {
                 const error = handleError(err, false);
                 if(error) {
                     TC_Dialog.alert(`Unable to ${enable ? "enable" : "disable"} mod`);
                     Logger.error(error);
                 } else {
                     if (modMeta.flags.includes("modify-request")) {
-                        getTabs().then(async tabs => {
-                            const filteredTabs = tabs.filter(tab => getOrigin(tab.url) === currentOrigin);
+                        getTabs().then(async browserTabs => {
+                            const filteredTabs = browserTabs.filter(tab => getOrigin(tab.url) === currentOrigin);
                             if (filteredTabs.length) {
                                 const tabMessage =`Would you like to refresh ${filteredTabs.length > 1? `${filteredTabs.length} active pages?` : "the page?"}`;
                                 const message = enable ? [
@@ -174,7 +176,7 @@ export default class ModItem extends React.Component<ModItemProps, S> {
                                 const result = await TC_Dialog.confirm(message);
                                 if(result) {
                                     for (const tab of filteredTabs) {
-                                        chrome.tabs.reload(tab.id);
+                                        tabs.reload(tab.id);
                                     }
                                 }
                             }

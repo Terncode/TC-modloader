@@ -5,6 +5,8 @@ import { attachDebugMethod, handleError, objectifyError } from "./utils";
 import { TCEventEmitter } from "./eventEmitter";
 import { Injector } from "../contents/injector";
 import { TC_Toaster } from "./Toaster";
+import runtime from "../browserCompatibility/browserRuntime";
+import { BrowserMessageSender } from "../browserCompatibility/browserInterfaces";
 
 type EventType = Exclude<ContentBackgroundMessage["type"], "ping" | "show-alert" | "show-prompt" | "show-confirm">
 export declare interface BackgroundMessageHandler {
@@ -20,15 +22,15 @@ export class BackgroundMessageHandler extends TCEventEmitter {
 
     constructor() {
         super();
-        chrome.runtime.onMessage.addListener(this.processMessage);
+        runtime.onMessage(this.processMessage);
         if(document.readyState !== "complete") {
             window.addEventListener("load", this.onLoad);
         }
         attachDebugMethod("bmhh", this);
     }
-    destroy() {
-        chrome.runtime.onMessage.removeListener(this.processMessage);
-    }
+    // destroy() {
+    //     runtime.offMessage(this.processMessage);
+    // }
     private onLoad = () => {
         while(this.queue.length) {
             const fn = this.queue.shift();
@@ -45,9 +47,9 @@ export class BackgroundMessageHandler extends TCEventEmitter {
         }
     }
 
-    private processMessage =  (request: ContentBackgroundMessage, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
+    private processMessage =  (request: ContentBackgroundMessage, sender: BrowserMessageSender, sendResponse: (response?: any) => void) => {
         Logger.debug(request, sender);
-        if (chrome.runtime.id === sender.id) {
+        if (runtime.getId() === sender.id) {
             switch (request.type) {
                 case "ping":
                     sendResponse(true);
@@ -106,7 +108,7 @@ export class BackgroundMessageHandler extends TCEventEmitter {
 
     sendMessage<R = any>(event: BackgroundMessage): Promise<R> {
         return new Promise((resolve,reject) => {
-            chrome.runtime.sendMessage(event, (response: R) => {
+            runtime.sendMessage(event).then((response: R) => {
                 const error = handleError(response, false);
                 if (error) {
                     reject(error);

@@ -1,3 +1,5 @@
+import { BrowserWebRequestHeaderDetails } from "../browserCompatibility/browserInterfaces";
+import webRequest from "../browserCompatibility/browserWebRequest";
 import { CodeModer, RequestBlocker } from "../commonInterface";
 import { InjectorType } from "../interfaces";
 import { OriginSetter } from "../pageSettings";
@@ -10,10 +12,10 @@ import { sendMessageToContent } from "./sendMessage";
 const CHROME_URL_DATA_CAP = 2097152;
 
 
-const craftUrl = (type: chrome.webRequest.ResourceType, code: string) => `data:;charset=utf-8,${encodeURIComponent(code)}`;
+const craftUrl = (_type: string, code: string) => `data:;charset=utf-8,${encodeURIComponent(code)}`;
 
-function createRedirect(details: chrome.webRequest.WebResponseHeadersDetails, payload: string) {
-    const contentType = details.responseHeaders.find(e => e.name.toLowerCase() === "content-type");
+function createRedirect(details: BrowserWebRequestHeaderDetails, payload: string) {
+    const contentType = (details.responseHeaders as chrome.webRequest.HttpHeader[]).find(e => e.name.toLowerCase() === "content-type");
     let redirectUrl = "";
     if (contentType && contentType.value) {
         redirectUrl = `data:;charset=utf-8,${encodeURIComponent(payload)}`;
@@ -41,11 +43,12 @@ function createRedirect(details: chrome.webRequest.WebResponseHeadersDetails, pa
 
 // where all the magic happens
 export function createScriptModifier(bmh: BackgroundModHandler, originSetter: OriginSetter) {
-    chrome.webRequest.onHeadersReceived.addListener(details => {
-        Logger.debug("[chrome.webRequest.onBeforeRequest]", details);
+    webRequest.onHeadersReceived(details => {
+        Logger.debug("[webRequest.onBeforeRequest]", details);
         if (!bmh.enabledOrigins.includes(getOrigin(details.url))) return;
 
-        if (details.initiator && details.initiator.includes("chrome-extension")) return; // Ignoring chrome extensions
+        const d = details as chrome.webRequest.WebResponseHeadersDetails;
+        if (d.initiator && d.initiator.includes("chrome-extension")) return; // Ignoring chrome extensions
 
         const requestOrigin = getOrigin(details.url);
 
@@ -95,7 +98,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
         const data = request.responseText;
         let modded = data;
         let failedMods: string[] = [];
-        const contentType = details.responseHeaders.find(e => e.name.toLowerCase() === "content-type");
+        const contentType = (details.responseHeaders as chrome.webRequest.HttpHeader[]).find(e => e.name.toLowerCase() === "content-type");
         const requestType = details.type;
         let hasError = false;
         let moded = false;
@@ -106,7 +109,7 @@ export function createScriptModifier(bmh: BackgroundModHandler, originSetter: Or
                 if (Array.isArray(actualModder.type) ? actualModder.type.includes(requestType as any) : actualModder.type === requestType) {
                     if(checkRegOrString(moder.searcher, url.pathname)) {
                         try {
-                            const newScript = (moder as CodeModer).mod(modded, details.responseHeaders, contentType && contentType.value, modifierMod.modderContext, url.pathname, requestUrl);
+                            const newScript = (moder as CodeModer).mod(modded, (details.responseHeaders as chrome.webRequest.HttpHeader[]), contentType && contentType.value, modifierMod.modderContext, url.pathname, requestUrl);
                             Logger.debug(`Modding "${requestUrl}" by ${modifierMod.mod.name}`);
                             new Function(newScript);
                             modded = newScript;

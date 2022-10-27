@@ -1,5 +1,6 @@
 import { BackgroundModHandler } from "./modsUtils";
 import { getOrigin, removeLastChar } from "../utils/utils";
+import browsingData from "../browserCompatibility/browsingData";
 
 export function cacheCleaner(bmh: BackgroundModHandler) {
     // There is a possibility that service worker will cache load the page.
@@ -39,11 +40,11 @@ export function clearOriginCache(origin: string, cb?: () => void) {
     }, TIMEOUT);
 
 
-    chrome.browsingData.remove({
+    browsingData.remove({
         origins: [origin],
     }, {
         cache: true,
         //cacheStorage: true,
         //serviceWorkers: true,
-    }, cb);
+    }).then(cb);
 }
