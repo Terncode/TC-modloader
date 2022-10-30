@@ -57,10 +57,11 @@ export class EventHandler<E = TCBaseEvent, R = TCBaseEvent> extends TCEventEmitt
         super.emit(...args);
     }
 
+
     onMessage = (event: CustomEvent<SignedTCEvent>) => {
         if (typeof event === "object") {
-            if (typeof event.detail === "object" && Array.isArray(event.detail)) {
-                const data = this.encoder.decode(event.detail);
+            if (BROWSER_ENV === "firefox" ? typeof event.detail === "string" && Array.isArray(JSON.parse(event.detail)) : typeof event.detail === "object" && Array.isArray(event.detail)) {
+                const data = this.encoder.decode(event.detail as any);
                 const payload = JSON.parse(data);
                 if (payload.type === "init-event") {
                     return;
@@ -168,7 +169,7 @@ export class EventHandler<E = TCBaseEvent, R = TCBaseEvent> extends TCEventEmitt
             signature: this.signature,
         });
         const buffer = this.encoder.encode(payload);
-        const event = new CustomEvent<number[]>(this.generatedId ,{cancelable:false, bubbles: false, detail: buffer});
+        const event = new CustomEvent<string | number[]>(this.generatedId ,{cancelable:false, bubbles: false, detail: buffer});
         this.eventElement.dispatchEvent(event);
     }
 }

@@ -179,6 +179,7 @@ function validateModAndGetModDetails(susMod: typeof BaseMod): Omit<ModMeta, "has
     const version = susMod.version;
     const flags = susMod.flags;
     const origins = susMod.origins;
+    const browserEnvironments = susMod.browserEnvironments;
     const requirements: ModRequirement[] = [];
     let priority = susMod.priority;
 
@@ -194,6 +195,11 @@ function validateModAndGetModDetails(susMod: typeof BaseMod): Omit<ModMeta, "has
     if (dependency && typeof dependency !== "string") {
         throw new Error("Invalid mod! Dependency not specified properly");
     }
+
+    if (browserEnvironments && !browserEnvironments.includes(BROWSER_ENV)) {
+        throw new Error("Mod not supported on this browser");
+    }
+
     if (typeof priority !== "number") {
         priority = 0;
     }

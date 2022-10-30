@@ -9,7 +9,11 @@ export function removeLastChar(string: string, lastCar: string) {
 }
 
 export function dataClone<O = any>(obj: O): O {
-    return JSON.parse(JSON.stringify(obj));
+    if (obj === null) return null;
+    if (typeof obj === "object") {
+        return JSON.parse(JSON.stringify(obj));
+    }
+    return obj;
 }
 
 export function pushUniq<T>(array: T[], item: T) {

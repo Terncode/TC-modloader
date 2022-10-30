@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { CodeModerOrBlocker, IBaseMod, ModFlags } from "../commonInterface";
+import { CodeModerOrBlocker, IBaseMod, ModFlags, ModloaderInfo } from "../commonInterface";
 
 
 export class BaseMod extends IBaseMod {
@@ -28,7 +28,7 @@ export class BaseMod extends IBaseMod {
     }
 
     static background?(event: any): Promise<any> | any;
-    onLoad(): Promise<void> | void {
+    onLoad(info: ModloaderInfo): Promise<void> | void {
     }
     onUnload(): Promise<void> | void {
     }

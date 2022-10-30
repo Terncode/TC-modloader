@@ -1,3 +1,4 @@
+import { dataClone } from "../utils/utils";
 import { BrowserRuntime, createNotImplemented } from "./browserInterfaces";
 
 const runtime: BrowserRuntime = {
@@ -58,7 +59,7 @@ if (BROWSER_ENV === "firefox") {
 
     runtime.onMessage = (callback) => {
         return browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-            return callback(msg, sender, sendResponse);
+            return callback(msg, sender, (res) => sendResponse(dataClone(res)));
         });
     };
 

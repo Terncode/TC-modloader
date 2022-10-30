@@ -24,11 +24,11 @@ export class ContentEventHandler extends EventHandler<VenomEvent, ContentEvent> 
 
             let listen = true;
             this.eventElement.addEventListener(this.broadcastId, (event: CustomEvent<number[]>) => {
-                if (event.detail && Array.isArray(event.detail)) {
+                if (event.detail) {
                     const buffer = this.encoder.decode(event.detail);
                     const decoded = JSON.parse(buffer);
                     if (decoded && decoded.type === "init-event" && decoded.data === "pong") {
-                        Logger.debug("init ping received");
+                        Logger.debug("C: init ping received");
                         listen = false;
                         clearTimeout(frame);
                         resolve();
@@ -48,7 +48,7 @@ export class ContentEventHandler extends EventHandler<VenomEvent, ContentEvent> 
                 };
                 const buffer = this.encoder.encode(JSON.stringify(payload));
                 while(listen && !stop) {
-                    const event = new CustomEvent<number[]>(this.broadcastId ,{cancelable:false, bubbles: false, detail: buffer});
+                    const event = new CustomEvent<string | number[]>(this.broadcastId , {cancelable:false, bubbles: false, detail: buffer});
                     this.eventElement.dispatchEvent(event);
                     await delay(1000);
                 }

@@ -29,8 +29,8 @@ export class VenomEventHandler extends EventHandler<ContentEvent, VenomEvent> {
                         type: "init-event",
                     };
                     const buffer = this.encoder.encode(JSON.stringify(returnObject));
-                    const returnEvent = new CustomEvent<number[]>(this.generatedId ,{cancelable:false, bubbles: false, detail: buffer});
-                    Logger.debug("Init ping received");
+                    const returnEvent = new CustomEvent<string | number[]>(this.generatedId ,{cancelable:false, bubbles: false, detail: buffer});
+                    Logger.debug("V: Init ping received");
                     this.eventElement.dispatchEvent(returnEvent);
                     resolve(data.data.settings);
                 } else {

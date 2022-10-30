@@ -1,9 +1,9 @@
 /// <reference path="../fix.d.ts" />
 
-import { cacheCleaner } from "../background/cacheCleaner";
+import { cacheCleaner, cacheCleanerFireFox } from "../background/cacheCleaner";
 import { createBackgroundScriptMessageHandler } from "../background/backgroundMessageHandler";
-import { createRequestInterceptor } from "../background/requestMod";
-import { createScriptModifier } from "../background/scriptModifier";
+import { createRequestInterceptor, createRequestInterceptorFirefox } from "../background/requestMod";
+import { createScriptModifier, createScriptModifierFirefox } from "../background/scriptModifier";
 import { ModBackgroundLoad, ModBackgroundUnload } from "../commonInterface";
 import {  BackgroundModHandler } from "../background/modsUtils";
 import { tryCatch } from "../utils/utils";
@@ -19,10 +19,16 @@ bmh.init().then(async () => {
     const originSetter  = new OriginSetter();
     await originSetter.init();
     const tabBadge = createTabUpdate(bmh);
-    cacheCleaner(bmh);
-    createScriptModifier(bmh, originSetter);
+    if (BROWSER_ENV === "chrome-mv2" || BROWSER_ENV === "chrome-mv3") {
+        cacheCleaner(bmh);
+        createRequestInterceptor(bmh);
+        createScriptModifier(bmh, originSetter);
+    } else {
+        cacheCleanerFireFox(bmh);
+        createRequestInterceptorFirefox(bmh);
+        createScriptModifierFirefox(bmh, originSetter);
+    }
     createBackgroundScriptMessageHandler(bmh, originSetter, tabBadge);
-    createRequestInterceptor(bmh);
 
     for (const modDef of bmh.backgroundMods) {
         const event: ModBackgroundLoad<any> = {

@@ -50,6 +50,16 @@ export interface BrowserTabs {
     create: (create: BrowserTabCreate) => Promise<BrowserTab>;
 }
 
+export interface BrowserStorage {
+    local: {
+        getQuotaBytes: () => number,
+        clear: () => Promise<void>;
+        get: (key: any) => Promise<{ [key: string]: any}>,
+        remove: (key: any) => Promise<void>;
+        set: (key: any) => Promise<void>;
+    }
+}
+
 export interface BrowserBrowserAction {
     setBadgeBackgroundColor: (details: BrowserBrowserActionBadgeBackgroundColorDetails) => void;
     setBadgeText: (details: BrowserBrowserActionTextDetails) => void

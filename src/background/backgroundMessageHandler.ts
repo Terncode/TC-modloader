@@ -73,10 +73,10 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
         }
         // Log data in dev version of the extension
         if (DEV) {
-            Logger.debug(`[incoming]`, message, sender);
+            Logger.debug(`[incoming] [${message.type}]`, message, sender);
             const org = sendResponse;
             sendResponse = value => {
-                Logger.debug(`[outgoing]`, value);
+                Logger.debug(`[outgoing] `, value);
                 org(value);
             };
         }
@@ -93,6 +93,7 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
         if (fn) {
             try {
                 const response = fn(messageRequest);
+                Logger.debug(response, fn, messageRequest);
                 if (typeof response === "boolean") {
                     return response;
                 }
@@ -107,7 +108,7 @@ export function createBackgroundScriptMessageHandler(bmh: BackgroundModHandler, 
         }
     });
 }
-function onlyPopup (sendResponse: BrowserSenderResponse) {
+function onlyPopup(sendResponse: BrowserSenderResponse) {
     sendResponse(objectifyError(new Error("This message can only be sent from popup")));
     return false;
 };

@@ -6,7 +6,7 @@ import { Logger } from "../utils/logger";
 import { TC_Toaster, Toast } from "../utils/Toaster";
 import { askToRefresh, delay, removeItem, timeOutPromise } from "../utils/utils";
 import semver from "semver";
-import { BackgroundCom, DependencyObject, ToastMethods } from "../commonInterface";
+import { BackgroundCom, DependencyObject, ModloaderInfo, ToastMethods } from "../commonInterface";
 import { ModGui } from "./gui";
 import { ButtonActivationPosition, InjectorType, OriginSettings, StealthMode } from "../interfaces";
 
@@ -246,8 +246,13 @@ export class ModLoader {
                 this.messageProcessor.set(hash, bgObj.fn);
             }
 
+            const info: ModloaderInfo = {
+                version: VERSION,
+                browserEnvironment: BROWSER_ENV,
+            };
+
             if (runningMod.onLoad) {
-                await timeOutPromise(() => runningMod.onLoad());
+                await timeOutPromise(() => runningMod.onLoad(info));
             }
             this.modsMap.set(mod.hash, {
                 ...compiled,

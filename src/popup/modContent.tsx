@@ -120,7 +120,7 @@ export default class ModSettings extends React.Component<P, S> {
     get originAddBtnMsg() {
         switch (this.state.status) {
             case "Blocked":
-                return "This origin is blocked by chrome";
+                return `This origin is blocked by ${BROWSER_ENV === "firefox" ? "Firefox" : "Chrome"}`;
             case "Pending":
                 return "The request is being processed";
             case "Errored":

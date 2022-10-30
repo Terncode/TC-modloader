@@ -6,7 +6,7 @@ import runtime from "../browserCompatibility/browserRuntime";
 const Div = styled.div`
     background-color: rgba(255, 255, 255, 0.25);
     font-size: 15px;
-    font-family: dead_space;
+    font-family: moz_dead_space, dead_space;
     text-align: center;
     padding: 5px;
     margin: 5px;
@@ -15,7 +15,7 @@ const Div = styled.div`
 const Small = styled.span`
     font-size: 15px;
     display: inline;
-    font-family: good_timing, monospace;
+    font-family: moz_good_timing, good_timing, monospace;
 `;
 
 export default class Banner extends React.Component {

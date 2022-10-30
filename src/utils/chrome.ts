@@ -1,28 +1,23 @@
 import { BrowserTabQueryInfo } from "../browserCompatibility/browserInterfaces";
+import storage from "../browserCompatibility/browserStorage";
 import tabs from "../browserCompatibility/browserTabs";
 
 export async function chromeRemoveItem(key?: string) {
-    return new Promise<void>(resolve => {
-        chrome.storage.local.remove(key, resolve);
-    });
+    await storage.local.remove(key);
 }
-export async function chromeGetItem<T = any | undefined>(key?: string) {
-    return new Promise<T>(resolve => {
-        chrome.storage.local.get(null, data => {
-            if(data) {
-                resolve(data[key]);
-            }  else {
-                resolve(undefined);
-            }
-        });
-    });
+export async function chromeGetItem<T = any | undefined>(key?: string): Promise<T> {
+    const data = await storage.local.get(null);
+    if(data) {
+        return data[key];
+    }  else {
+        return null;
+    }
+
 }
 export async function chromeSetItem(key: string, value: any) {
-    return new Promise<void>(resolve => {
-        const obj = {};
-        obj[key] = value;
-        chrome.storage.local.set(obj, resolve);
-    });
+    const obj = {};
+    obj[key] = value;
+    await storage.local.set(obj);
 }
 
 export async function getTabs(queryInfo: BrowserTabQueryInfo = {}) {

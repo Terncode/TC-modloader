@@ -9,6 +9,12 @@
     <img src="./assets/images/webpage-gui.png"></img>
 </center>
 
+# Compatibility
+The modloader currently supports firefox and chrome
+### Behaviour
+The modloader works better on firefox because it natively support request modifying where in chrome it has to manually inject script in to page to make it work.
+Chrome manifest v3 is currently not supported 
+
 ## Safety?
 With great power comes great responsibility. You should never trust mods that you find online. The mod-loader does only comes with basic protection against malicious code.
 

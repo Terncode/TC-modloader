@@ -95,6 +95,13 @@ export interface IBaseMod {
     dependencyMethods?: any;
 }
 
+type BrowserEnvironments = "chrome-mv2" | "chrome-mv3" | "firefox";
+
+export interface ModloaderInfo {
+    version: string;
+    browserEnvironment: BrowserEnvironments;
+}
+
 export abstract class IBaseMod {
     gui: IModGui;
     toaster: Toaster;
@@ -111,6 +118,8 @@ export abstract class IBaseMod {
 
     static requirements?: string[];
 
+    static browserEnvironments?: BrowserEnvironments[];
+
     static installedDependencies?: DependencyObject;
     installedDependencies?: DependencyObject;
 
@@ -122,7 +131,7 @@ export abstract class IBaseMod {
     static background?(event: ModBackgroundEvent): Promise<any> | any;
     protected backgroundCom?: BackgroundCom;
 
-    protected onLoad?(): Promise<void> | void;
+    protected onLoad?(modloaderInfo: ModloaderInfo): Promise<void> | void;
     protected onUnload?(): Promise<void> | void;
 
     static getItem?<V = any>(_key: string): Promise<V>;

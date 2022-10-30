@@ -6,7 +6,7 @@ export class EncodeDecoder {
 
     constructor(private encoding_key: string) {}
 
-    encode(message: string): Buffer {
+    encode(message: string): Buffer | string {
         const buffer: Buffer = [];
         const nextIndex = new NextIndex(this.encoding_key, EncodeDecoder.runtime_hash);
         for (let i = 0; i < message.length; i++) {
@@ -14,13 +14,15 @@ export class EncodeDecoder {
             charCode += nextIndex.nextNumber();
             buffer.push(charCode);
         }
-        return buffer;
+        return BROWSER_ENV === "firefox" ? JSON.stringify(buffer) : buffer; // Firefox is having problems passing none primitive types in to window
     }
-    decode(what: Buffer): string {
+    decode(what: Buffer | string): string {
+        what = BROWSER_ENV === "firefox" ? JSON.parse(what as string) : what;
+
         let decoded = "";
         const nextIndex = new NextIndex(this.encoding_key, EncodeDecoder.runtime_hash);
         for (let i = 0; i < what.length; i++) {
-            const charCode = what[i] - nextIndex.nextNumber();
+            const charCode = (what as Buffer)[i] - nextIndex.nextNumber();
             decoded += String.fromCharCode(charCode);
         }
         return decoded;

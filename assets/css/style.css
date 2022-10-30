@@ -14,3 +14,21 @@
   font-family: good_timing;
   src: url('chrome-extension://__MSG_@@extension_id__/assets/fonts/GoodTiming.ttf');
 }
+
+
+@font-face {
+  font-family: moz_origin_tech;
+  src: url('moz-extension://__MSG_@@extension_id__/assets/fonts/NightMachine.otf');
+}
+@font-face {
+  font-family: moz_night_machine;
+  src: url('moz-extension://__MSG_@@extension_id__/assets/fonts/NightMachine.otf');
+}
+@font-face {
+  font-family: moz_dead_space;
+  src: url('moz-extension://__MSG_@@extension_id__/assets/fonts/DeadSpace.ttf');
+}
+@font-face {
+  font-family: moz_good_timing;
+  src: url('moz-extension://__MSG_@@extension_id__/assets/fonts/GoodTiming.ttf');
+}

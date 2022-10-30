@@ -549,7 +549,7 @@ function createStyle(fadeout: number) {
             text-align: center !important;
             font-size: 20px !important;
             outline: none !important;
-            font-family: good_timing, monospace !important;
+            font-family: moz_good_timing, good_timing, monospace !important;
             cursor: pointer !important;
             user-select: none !important;
             transition: ${transitionsButton.join(", ")};
@@ -566,7 +566,7 @@ function createStyle(fadeout: number) {
             outline: none !important;
             min-width: 150px;
             min-height: 50px;
-            font-family: good_timing, monospace !important;
+            font-family: moz_good_timing, good_timing, monospace !important;
             user-select: none !important;
             z-index: ${Number.MAX_SAFE_INTEGER};
         }
@@ -576,14 +576,14 @@ function createStyle(fadeout: number) {
             font-size: 15px;
             text-align: left;
             outline: none;
-            font-family: good_timing, monospace;
+            font-family: moz_good_timing, good_timing, monospace;
             padding: 2px;
             margin: 2px;
         }
         .${bannerClass} {
             background-color: rgba(255,255,255,0.25);
             font-size: 15px;
-            font-family: dead_space;
+            font-family: moz_dead_space, dead_space;
             text-align: center;
             padding: 5px;
             margin: 5px;

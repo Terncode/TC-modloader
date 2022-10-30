@@ -3,9 +3,20 @@ const pack = require("./package.json");
 const del = require("del");
 const fs = require("fs-extra");
 const path = require("path");
+const { debounce } = require("lodash");
+const zipFolder = require("zip-folder");
 const spawn = require("child_process").spawn;
-const packName = ["build", `${pack.name}-${pack.version}`];
+
+
+let BROWSER_ENV = "chrome-mv2";
+try {
+    BROWSER_ENV = process.env.BROWSER_ENV || "chrome-mv2";
+} catch (error) {
+    console.error(error);
+}
+const packName = ["build", `${pack.name}-${pack.version}-${BROWSER_ENV}`];
 const paths = [...packName , "assets"];
+
 
 let production = false;
 
@@ -26,7 +37,7 @@ const runWebpack = (name) => {
 };
 
 const clean = () => del([
-    "build/*",
+    `${packName.join("/")}/*`,
 ]);
 
 const ensureDirs = cb => {
@@ -153,11 +164,38 @@ const build = gulp.series(
     runWebpack(),
     genManifest);
 
-const buildAssets = gulp.series(copyAssets, genManifest);
-const buildScript = gulp.series(copyInterface, runWebpack("build-scripts"), genManifest);
+const zipIt = cb => {
+    const dir = path.join.apply(null, [process.cwd(), ...packName]);
+    const p = `${dir}.zip`;
+    if (fs.existsSync(p)) {
+        fs.unlinkSync(p);
+    }
+
+    zipFolder(dir, p, (err) => {
+        if (err) {
+            console.error(err);
+        }
+        cb();
+    });
+};
+const firefoxDev = BROWSER_ENV === "firefox" ? zipIt : (cb) => cb();
+
+
+const buildAssets = gulp.series(copyAssets, genManifest, firefoxDev);
+const buildScript = gulp.series(copyInterface, runWebpack("build-scripts"), genManifest, firefoxDev);
 const watchTools = cb => {
     gulp.watch(["src/**/*", "!src/generated/**/*"], buildScript);
     gulp.watch(["assets/**/*"], buildAssets);
+    if (BROWSER_ENV === "firefox") {
+        const zip = debounce(cb => {
+            zipIt(() => {
+                console.log("Zip updated");
+                cb();
+            });
+        }, 1000);
+        gulp.watch([`${paths.join("/")}/scripts/*`], zip);
+    }
+
     cb();
 };
 
@@ -168,7 +206,7 @@ const setProd = cb => {
 };
 const buildProd = gulp.series(setProd, buildFull);
 
-const dev = gulp.series(watchTools, build);
+const dev = gulp.series(watchTools, build, firefoxDev);
 module.exports = {
     zipmodbuilder: zipModBuilder,
     build: buildFull,

@@ -215,7 +215,7 @@ export function getToasterStyle() {
         width: 100%;
         display: flex;
         flex-direction: column;
-        font-family: dead_space, monospace;
+        font-family: moz_dead_space, dead_space, monospace;
         padding: 0;
         margin: 0;
         user-select: none;
@@ -228,7 +228,7 @@ export function getToasterStyle() {
         border: 1px solid white;
         background-color: black;
         color: white;
-        font-family: dead_space, monospace;
+        font-family: moz_dead_space, dead_space, monospace;
         padding: 2px;
         margin: auto;
         display: flex;

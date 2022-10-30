@@ -8,7 +8,7 @@ Popup handles all the mod installations and extension settings. It is running "v
 ## Background
 Background script is holding installed mods, modifies requests for script to allow injection and blocks specific scripts
 
-## Venom 
+## Venom
 A venom is injected script having full access to the webpage context with global variables and everything.
 
 ## Content

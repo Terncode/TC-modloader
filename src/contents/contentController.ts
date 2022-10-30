@@ -41,7 +41,7 @@ export async function createContentController(bgHandler: BackgroundMessageHandle
         toast && toast.setType("info").setDescription(data ? "Injected" : "Sterilized").show(shownTime);
     });
     if (inject) {
-        const toast =  !isStealthMode(injector.injectorData?.settings) &&  TC_Toaster.makeToast("TC injector", "Injecting...").show(Number.MAX_SAFE_INTEGER);
+        const toast = !isStealthMode(injector.injectorData?.settings) &&  TC_Toaster.makeToast("TC injector", "Injecting...").show(Number.MAX_SAFE_INTEGER);
         try {
             await injector.inject();
             try {

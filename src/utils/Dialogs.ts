@@ -236,7 +236,7 @@ export function getToasterStyle() {
         top: 0px;
         background-color: rgba(0, 0, 0, 0.75);
         transition: opacity ${TC_Dialog.FADE}ms;
-        font-family: good_timing, monospace;
+        font-family: moz_good_timing, good_timing, monospace;
         overflow: auto;
         z-index: ${Number.MAX_SAFE_INTEGER - 10}
     }
@@ -257,7 +257,7 @@ export function getToasterStyle() {
         z-index: ${Number.MAX_SAFE_INTEGER}
     }
     .${TC_Dialog.TC_DIALOG_CLASS} > div > h1 {
-        font-family: good_timing, monospace;
+        font-family: moz_good_timing, monospace;
         white-space: pre;
         margin: 0px;
         padding: 2px;
@@ -265,7 +265,7 @@ export function getToasterStyle() {
         margin-bottom: 5px;
     }
     .${TC_Dialog.TC_DIALOG_CLASS} > div > button {
-        font-family: good_timing, monospace;
+        font-family: moz_good_timing, good_timing, monospace;
         font-size: 15px;
 
         background-color: black;

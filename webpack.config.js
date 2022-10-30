@@ -4,7 +4,11 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { uid } = require("uid");
 const WEBPACK_TC_BROADCAST_MESSAGE = uid(32).toUpperCase();
 const WEBPACK_TC_BROADCAST_ATTRIBUTE = validAttribute();
-const BROWSER_ENV = `chrome-mv2`;
+let BROWSER_ENV = `chrome-mv2`;
+
+try {
+    BROWSER_ENV = process.env.BROWSER_ENV || "chrome-mv2";
+} catch (_) {}
 
 function validAttribute () {
     let generated = uid(32);
@@ -76,7 +80,7 @@ module.exports = scripts.map(s => ({
     devtool: DEV ? "eval-source-map" : false,
     output: {
         path: __dirname,
-        filename: `./build/${pack.name}-${pack.version}/assets/scripts/[name].js`
+        filename: `./build/${pack.name}-${pack.version}-${BROWSER_ENV}/assets/scripts/[name].js`
     },
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx"],
