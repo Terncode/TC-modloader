@@ -76,8 +76,17 @@ const compile = async cb => {
     cb();
 };
 
+const buildTask = gulp.series(clean, npmScript("build-js"), compile);
+
+const dev = cb => {
+    buildTask();
+    gulp.watch("src/mods/**/*", buildTask);
+    cb();
+};
 
 module.exports = {
     default:  gulp.series(clean, npmScript("build-js"), compile),
+    buildTask,
+    dev,
     compile,
 };
